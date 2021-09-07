@@ -14,15 +14,8 @@ module.exports = function(projectName) {
     logger.bgInfo(`npm init vite@latest ${projectName} -- --template vue`)
     spawnSync(`npm init vite@latest ${projectName} -- --template vue`, [], { shell: true, stdio: 'inherit' })
 
-    fs.copySync(path.join(templatePath, 'assets'), path.join(projectPath, 'src/assets'))
-    fs.copySync(path.join(templatePath, 'utils'), path.join(projectPath, 'src/utils'))
-    fs.copySync(path.join(templatePath, 'store'), path.join(projectPath, 'src/store'))
-    fs.copySync(path.join(templatePath, 'api'), path.join(projectPath, 'src/api'))
-    fs.copySync(path.join(templatePath, 'router'), path.join(projectPath, 'src/router'))
-    fs.copySync(path.join(templatePath, 'views'), path.join(projectPath, 'src/views'))
-    fs.copySync(path.join(templatePath, 'main.js'), path.join(projectPath, 'src/main.js'))
-    fs.copySync(path.join(templatePath, 'App.vue'), path.join(projectPath, 'src/App.vue'))
-    fs.copySync(path.join(templatePath, 'vite.config.js'), path.join(projectPath, 'vite.config.js'))
+    logger.bgInfo(`改造&丰富 基础结构`)
+    fs.copySync(path.join(templatePath), path.join(projectPath))
 
     /*
     * 安装插件 axios vue-router@4 vuex@next vuex-persistedstate

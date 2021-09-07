@@ -1,8 +1,9 @@
-import axios from 'template/utils/apiAxios'
+import axios from 'template/src/utils/apiAxios'
 // import store from '../store'
 
 // 创建 api 实例
 const apiAxios = axios.create({
+    // https://cn.vitejs.dev/guide/env-and-mode.html
     baseURL: import.meta.env.VUE_APP_API_BASE_URL || '/', // process.env.NODE_ENV === 'development' ? '' : process.env.VUE_APP_API_BASE_URL,
     timeout: 1000 * 60
 })
