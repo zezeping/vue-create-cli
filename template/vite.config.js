@@ -22,5 +22,13 @@ export default defineConfig({
       // '/api': 'http://127.0.0.1:3000',
     }
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // additionalData: `$injectedColor: orange;`
+        additionalData: '@import "@/assets/stylesheets/globalInjectedData.scss";'
+      }
+    }
+  },
   plugins: [vue()]
 })

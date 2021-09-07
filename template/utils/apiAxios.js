@@ -8,7 +8,7 @@ const apiAxios = axios.create({
 })
 
 // 设置 post 请求头
-axios.defaults.headers.post['Content-Type'] = 'application/json'
+apiAxios.defaults.headers.post['Content-Type'] = 'application/json'
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
 // 请求拦截
