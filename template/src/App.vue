@@ -1,7 +1,19 @@
 <template>
   <img alt="Vue logo" src="src/assets/logo.png" />
+  <svg-icon name="help" style="color: red; width: 100px; height: 100px"></svg-icon>
   <HelloWorld msg="Hello Vue 3 + Vite" />
-  <hr>
+  <hr/>
+  <table class="table border text-overflow-ellipsis" style="width: 200px; margin: 0 auto;">
+    <tr>
+      <th style="flex-grow: 0.5;">序号</th>
+      <th>内容</th>
+    </tr>
+    <tr>
+      <td style="flex-grow: 0.5;">1</td>
+      <td>你好世界</td>
+    </tr>
+  </table>
+  <hr/>
   <router-view/>
 </template>
 

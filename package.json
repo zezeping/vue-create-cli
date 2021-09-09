@@ -1,6 +1,6 @@
 {
   "name": "@zezeping/vue-create-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "bin/index.js",
   "bin": {
@@ -15,6 +15,7 @@
     "chalk": "^4.1.2",
     "commander": "^8.1.0",
     "fs-extra": "^10.0.0",
+    "lodash": "^4.17.21",
     "prompts": "^2.4.1"
   }
 }
