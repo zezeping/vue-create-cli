@@ -44,7 +44,11 @@ export default defineConfig(params => {
     },
     plugins: [
       vue(),
-      svgLoader()
+      svgLoader({
+        svgoConfig: {
+          multipass: true
+        }
+      })
     ]
   }
 })
