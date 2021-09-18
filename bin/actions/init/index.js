@@ -3,6 +3,7 @@ const _ = require('lodash')
 const spawnSync = require('child_process').spawnSync
 const fs = require('fs-extra')
 const logger = require('../../utils/logger')
+const inquirerStatements = require('../../utils/inquirerStatements')
 
 module.exports = function (projectName) {
   console.log(projectName)
@@ -10,6 +11,7 @@ module.exports = function (projectName) {
   const cwdPath = process.cwd()
   const projectPath = path.resolve(cwdPath, projectName)
   const templatePath = path.resolve(__dirname, '../../../template')
+  const librariesPath = path.resolve(__dirname, '../../../libraries')
   
   // 创建项目
   logger.bgInfo(`npm init vite@latest ${projectName} -- --template vue`)
@@ -20,9 +22,10 @@ module.exports = function (projectName) {
   // package.json
   let packageJson = fs.readJsonSync(path.resolve(projectPath, 'package.json'))
   packageJson = _.merge(packageJson, {
-    "main": "index.js",
+    private: true,
+    main: 'index.js',
     scripts: {
-      'svgo': 'svgo -f src/components/ext/SvgIcon/svg'
+      svgo: 'svgo -f src/components/ext/SvgIcon/svg'
     }
   })
   fs.writeJsonSync(path.resolve(projectPath, 'package.json'), packageJson, {spaces: 2})
@@ -41,5 +44,20 @@ module.exports = function (projectName) {
     shell: true,
     stdio: 'inherit',
     cwd: projectPath
+  })
+  // ui库
+  inquirerStatements.addUiLibraries().then(selectedAnswers => {
+    console.error(selectedAnswers)
+    if (selectedAnswers.indexOf('ElementPlus') !== -1) {
+      logger.bgInfo(`添加ElementPlus相关库`)
+      logger.bgInfo(`npm i element-plus -S --registry https://registry.npm.taobao.org`)
+      spawnSync(`npm i element-plus -S --registry https://registry.npm.taobao.org`, [], {
+        shell: true,
+        stdio: 'inherit',
+        cwd: projectPath
+      })
+      fs.ensureDirSync(path.join(projectPath, 'src/components/ext/element-plus'))
+      fs.copySync(path.join(librariesPath, 'element-plus/components'), path.join(projectPath, 'src/components/ext/element-plus'))
+    }
   })
 }
