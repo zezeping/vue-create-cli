@@ -1,15 +1,15 @@
 <template>
-  <div class="your-sticky" ref="rootRef" :style="rootStyle">
+  <div class="ext-sticky" ref="rootRef" :style="rootStyle">
     <slot></slot>
   </div>
 </template>
 
 <script>
-import {ref, reactive, computed, onMounted, onUnmounted, nextTick} from 'vue'
+import {defineComponent, ref, reactive, computed, onMounted, onUnmounted, nextTick} from 'vue'
 import {getScrollParent} from './utils/getScrollParent'
 import {getRect} from './utils/getRect'
 
-export default {
+export default defineComponent({
   name: 'Sticky',
   props: {
     offset: {
@@ -238,9 +238,9 @@ export default {
       state
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>
-.your-sticky {}
+.ext-sticky {}
 </style>

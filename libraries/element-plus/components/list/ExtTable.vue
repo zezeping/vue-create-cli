@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import { useSlots } from 'vue'
+import { useSlots, defineComponent } from 'vue'
 import { ElTable, ElTableColumn } from 'element-plus'
 import ExtPagination from './ExtPagination'
 import ExtSearchBar from './ExtSearchBar'
-export default {
+export default defineComponent({
 	inheritAttrs: false,
 	components: {
 		[ElTable.name]: ElTable,
@@ -180,7 +180,7 @@ export default {
 		this.defaultQuery = this.getTableQuery()
 		this.fetchData({...this.$route.query})
 	}
-}
+})
 </script>
 
 <style lang="scss" scoped>

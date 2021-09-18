@@ -7,9 +7,9 @@
 </template>
 
 <script>
-import {ref, onMounted, onBeforeUnmount} from 'vue'
+import {defineComponent, ref, onMounted, onBeforeUnmount} from 'vue'
 
-export default {
+export default defineComponent({
   name: 'ContextMenu',
   setup(props, context) {
     const menuSwitch = ref(false)
@@ -65,7 +65,7 @@ export default {
       closeMenu
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

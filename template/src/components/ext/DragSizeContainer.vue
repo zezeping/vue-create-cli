@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import { onMounted, onUpdated, ref } from 'vue'
-export default {
+import { defineComponent, onMounted, onUpdated, ref } from 'vue'
+export default defineComponent({
   name: 'DragSizeContainer',
   props: {
     minWidth: { type: Number, default: 0 },
@@ -99,7 +99,7 @@ export default {
       dragSizeContainer
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

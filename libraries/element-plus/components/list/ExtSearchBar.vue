@@ -24,8 +24,9 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue'
 import { ElForm, ElFormItem, ElInput, ElSelect } from 'element-plus'
-export default {
+export default defineComponent({
 	components: {
 		[ElForm.name]: ElForm,
 		[ElFormItem.name]: ElFormItem,
@@ -55,5 +56,5 @@ export default {
 			this.$emit('reset', this.$refs['formRef'])
 		}
 	}
-}
+})
 </script>

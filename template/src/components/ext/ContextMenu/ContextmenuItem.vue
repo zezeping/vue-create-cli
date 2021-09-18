@@ -9,9 +9,9 @@
 </template>
 
 <script>
-import {ref, watch} from 'vue'
+import {defineComponent, ref, watch} from 'vue'
 
-export default {
+export default defineComponent({
   name: 'ContextMenuItem',
   setup(props, {slots: $slots}) {
     const contextMenuItemRef = ref(null)
@@ -54,7 +54,7 @@ export default {
       }
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

@@ -12,8 +12,9 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue'
 import { ElPagination } from 'element-plus'
-export default {
+export default defineComponent({
 	components: {
 		ElPagination
 	},
@@ -44,7 +45,7 @@ export default {
 			this.$emit('search', { ...this.data, [this.mapKeys.pageSize]: pageSize })
 		}
 	}
-}
+})
 </script>
 
 <style lang="scss" scoped>

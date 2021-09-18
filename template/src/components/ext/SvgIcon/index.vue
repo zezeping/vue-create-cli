@@ -5,12 +5,13 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue'
 // 异步导入， 等价asyncDefineComponent
 // const modules = import.meta.glob('./svg/*.svg')
 // 同步导入
 const modules = import.meta.globEager('./svg/*.svg')
 import {computed} from 'vue'
-export default {
+export default defineComponent({
   name: 'SvgIcon',
   props: {
     name: {
@@ -35,7 +36,7 @@ export default {
       return { [componentName]: modules[key].default }
     }))
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>
