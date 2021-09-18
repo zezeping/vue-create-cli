@@ -32,8 +32,8 @@ module.exports = function (projectName) {
   /*
   * 安装插件 axios vue-router@4 vuex@next vuex-persistedstate
   */
-  logger.bgInfo(`npm install && npm i axios vue-router@4 vuex@next vuex-persistedstate -S --registry https://registry.npm.taobao.org`)
-  spawnSync(`npm install && npm i axios vue-router@4 vuex@next vuex-persistedstate -S --registry https://registry.npm.taobao.org`, [], {
+  logger.bgInfo(`npm install && npm i normalize.css axios vue-router@4 vuex@next vuex-persistedstate -S --registry https://registry.npm.taobao.org`)
+  spawnSync(`npm install && npm i normalize.css axios vue-router@4 vuex@next vuex-persistedstate -S --registry https://registry.npm.taobao.org`, [], {
     shell: true,
     stdio: 'inherit',
     cwd: projectPath
