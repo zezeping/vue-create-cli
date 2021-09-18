@@ -12,9 +12,9 @@
 		</slot>
 		<el-table :data="tableData" v-loading="loading" v-bind="$attrs">
 			<template v-for="(column, idx) in tableColumns" :key="idx">
-				<el-table-column :prop="column.key" :label="column.label" :width="column.width">
-					<template v-slot:default="{row, $index}">
-						<slot :name="column.slot || `${column.key}Column`" v-bind="{row, $index}">{{ row[column.key] }}</slot>
+				<el-table-column v-bind="column">
+					<template v-slot:default="{row, column: slotColumn, $index}" v-if="column.type !== 'selection'">
+						<slot :name="column.slot || `${column.prop}Column`" v-bind="{row, column: slotColumn, $index}">{{ row[column.prop] }}</slot>
 					</template>
 				</el-table-column>
 			</template>
@@ -191,7 +191,7 @@ export default {
 
 <!--<template>-->
 <!--	<div class="home">-->
-<!--		<ext-table :config="tableConfig" style="width: 100%">-->
+<!--		<ext-table :config="tableConfig" style="width: 100%" @selection-change="selectionChange">-->
 <!--			&lt;!&ndash;			自定义SearchBar &ndash;&gt;-->
 <!--			&lt;!&ndash;			<template v-slot:searchBar="{queryList, config, getTableQuery}">&ndash;&gt;-->
 <!--			&lt;!&ndash;				<div>自定义SearchBar: {{ queryList }} - {{ config }} - {{ getTableQuery }}</div>&ndash;&gt;-->
@@ -209,8 +209,8 @@ export default {
 <!--			&lt;!&ndash;			  <el-button @click="reset">重置1</el-button>&ndash;&gt;-->
 <!--			&lt;!&ndash;		  </template>&ndash;&gt;-->
 <!--			&lt;!&ndash;table column item slot&ndash;&gt;-->
-<!--			<template v-slot:nameColumn="{row, $index}">-->
-<!--				<el-button>{{ row }}- {{ $index }}</el-button>-->
+<!--			<template v-slot:nameColumn="{row, column, $index}">-->
+<!--				<el-button>{{ row }} - {{ column }} - {{ $index }}</el-button>-->
 <!--			</template>-->
 <!--			&lt;!&ndash;		  自定义pagination&ndash;&gt;-->
 <!--			&lt;!&ndash;		  <template v-slot:pagination="{data, mapKeys}">&ndash;&gt;-->
@@ -219,7 +219,6 @@ export default {
 <!--		</ext-table>-->
 <!--	</div>-->
 <!--</template>-->
-
 <!--<script>-->
 <!--export default {-->
 <!--	data() {-->
@@ -273,9 +272,10 @@ export default {
 <!--					}, 3000)-->
 <!--				}),-->
 <!--				columns: [-->
-<!--					{ label: '日期', key: 'date' },-->
-<!--					{ label: '姓名', key: 'name' },-->
-<!--					{ label: '地址', key: 'address' },-->
+<!--					{ type: 'selection', width: 55 },-->
+<!--					{ label: '日期', prop: 'date' },-->
+<!--					{ label: '姓名', prop: 'name' },-->
+<!--					{ label: '地址', prop: 'address' },-->
 <!--				],-->
 <!--				// 优先级: (<ext-table :data="data" />) > config.data > config.fetchData()-->
 <!--				//data: [-->
@@ -283,6 +283,11 @@ export default {
 <!--				//	{ date: '2016-05-02', name: '王小虎', address: '上海市普陀区金沙江路 1518 弄', },-->
 <!--				//],-->
 <!--			},-->
+<!--		}-->
+<!--	},-->
+<!--	methods: {-->
+<!--		selectionChange(items) {-->
+<!--			console.log('selectedItems', items)-->
 <!--		}-->
 <!--	}-->
 <!--}-->
