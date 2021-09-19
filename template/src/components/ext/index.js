@@ -1,4 +1,4 @@
-// import ExtElementPlus from './element-plus'
+// import ExtElementPlus from './extElementPlus'
 
 // import Sticky from './Sticky'
 // import ContextMenu from './ContextMenu'

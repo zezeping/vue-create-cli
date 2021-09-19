@@ -56,8 +56,8 @@ module.exports = function (projectName) {
         stdio: 'inherit',
         cwd: projectPath
       })
-      fs.ensureDirSync(path.join(projectPath, 'src/components/ext/element-plus'))
-      fs.copySync(path.join(librariesPath, 'element-plus/components'), path.join(projectPath, 'src/components/ext/element-plus'))
+      fs.ensureDirSync(path.join(projectPath, 'src/components/ext/extElementPlus'))
+      fs.copySync(path.join(librariesPath, 'extElementPlus/components'), path.join(projectPath, 'src/components/ext/extElementPlus'))
     }
   })
 }

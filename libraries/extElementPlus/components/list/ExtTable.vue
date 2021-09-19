@@ -232,12 +232,10 @@ export default defineComponent({
 <!--						},-->
 <!--						{-->
 <!--							key: 'gender', value: '', label: '性别', type: 'select',-->
-<!--							options: [{label: '男', value: 'male'}, {label: '女', value: 'female'}],-->
-<!--							attrs: { placeholder: '请选择性别' },-->
+<!--							attrs: { placeholder: '请选择性别', options: [{label: '男', value: 'male'}, {label: '女', value: 'female'}], },-->
 <!--						},-->
 <!--						{ key: 'isAdult', value: '', label: '是否成年', type: 'select',-->
-<!--							options: [{label: '成年', value: 'true'}, {label: '未成年', value: 'false'}],-->
-<!--							attrs: { placeholder: '请选择类型', clearable: true, },-->
+<!--							attrs: { placeholder: '请选择类型', clearable: true, options: [{label: '成年', value: 'true'}, {label: '未成年', value: 'false'}], },-->
 <!--							getValue(queryItem, form) {-->
 <!--								// 根据当前搜索的值，给搜索form添加额外搜索字段-->
 <!--								if (/true|false/.test(queryItem.value)) {-->

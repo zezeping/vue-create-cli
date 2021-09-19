@@ -5,11 +5,13 @@
 				<slot :name="query.slot || `${query.key}Query`" :query="query">
 					<el-form-item :prop="query.key" :label="query.label" :rules="query.rules">
 						<el-input v-model="query.value" v-bind="query.attrs" v-if="query.type === 'input'"></el-input>
-						<el-select v-model="query.value" v-bind="query.attrs" v-else-if="query.type === 'select'">
-							<template v-for="(option, idx) in query.options" :key="idx">
-								<el-option :value="option.value" :label="option.label"></el-option>
+						<ext-select v-model="query.value" v-bind="query.attrs" v-else-if="query.type === 'select'">
+							<template v-slot:default="{ options, labelKey, valueKey }">
+								<template v-for="(option, idx) in options" :key="idx">
+									<el-option :value="option[valueKey]" :label="option[labelKey]"></el-option>
+								</template>
 							</template>
-						</el-select>
+						</ext-select>
 					</el-form-item>
 				</slot>
 			</template>
@@ -26,12 +28,14 @@
 <script>
 import { defineComponent } from 'vue'
 import { ElForm, ElFormItem, ElInput, ElSelect } from 'element-plus'
+import ExtSelect from '../form/ExtSelect'
 export default defineComponent({
 	components: {
 		[ElForm.name]: ElForm,
 		[ElFormItem.name]: ElFormItem,
 		[ElInput.name]: ElInput,
 		[ElSelect.name]: ElSelect,
+		ExtSelect
 	},
 	props: {
 		config: Object,
