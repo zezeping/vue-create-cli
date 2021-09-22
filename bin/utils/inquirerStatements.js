@@ -5,8 +5,8 @@ module.exports = {
     return inquirer.prompt([
       {
         type: 'checkbox',
-        message: 'Select toppings',
-        name: 'toppings',
+        message: '可快速集成的ui库',
+        name: 'uis',
         choices: [
           new inquirer.Separator(' = PC = '), // 分割线
           { name: 'ElementPlus', checked: true, },
@@ -19,10 +19,20 @@ module.exports = {
           //}
           return true
         },
+      }, {
+        type: 'checkbox',
+        message: '可快速集成的其他库',
+        name: 'others',
+        choices: [
+          { name: 'Echarts', checked: true, },
+        ],
+        validate (answer) {
+          return true
+        },
       },
     ]).then((answers) => {
-      const { toppings: selectedAnswers } = answers
-      return selectedAnswers
+      const { uis, others } = answers
+      return [...uis, ...others]
     })
   }
 }

@@ -8,5 +8,5 @@ $ npm i @zezeping/vue-create-cli -g
 
 # 初始化Vue项目
 ```bash
-vue-create-cli init <ProjectName>
+vue-create-cli init <ProjectName> --registry https://registry.npm.taobao.org
 ```

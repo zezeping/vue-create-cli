@@ -5,8 +5,9 @@ const fs = require('fs-extra')
 const logger = require('../../utils/logger')
 const inquirerStatements = require('../../utils/inquirerStatements')
 
-module.exports = function (projectName) {
-  console.log(projectName)
+module.exports = async function (projectName, options, command) {
+  const { registry } = options
+  console.log(projectName, options)
   
   const cwdPath = process.cwd()
   const projectPath = path.resolve(cwdPath, projectName)
@@ -14,10 +15,10 @@ module.exports = function (projectName) {
   const librariesPath = path.resolve(__dirname, '../../../libraries')
   
   // 创建项目
-  logger.bgInfo(`npm init vite@latest ${projectName} -- --template vue`)
+  logger.info(`npm init vite@latest ${projectName} -- --template vue`)
   spawnSync(`npm init vite@latest ${projectName} -- --template vue`, [], {shell: true, stdio: 'inherit'})
   
-  logger.bgInfo(`改造&丰富 基础结构`)
+  logger.info(`改造&丰富 基础结构`)
   fs.copySync(path.join(templatePath), path.join(projectPath))
   // package.json
   let packageJson = fs.readJsonSync(path.resolve(projectPath, 'package.json'))
@@ -32,32 +33,43 @@ module.exports = function (projectName) {
   /*
   * 安装插件 axios vue-router@4 vuex@next vuex-persistedstate
   */
-  logger.bgInfo(`npm install && npm i normalize.css axios vue-router@4 vuex@next vuex-persistedstate -S --registry https://registry.npm.taobao.org`)
-  spawnSync(`npm install && npm i normalize.css axios vue-router@4 vuex@next vuex-persistedstate -S --registry https://registry.npm.taobao.org`, [], {
+  logger.info(`npm install && npm i normalize.css axios vue-router@4 vuex@next vuex-persistedstate -S --registry ${registry}`)
+  spawnSync(`npm install && npm i normalize.css axios vue-router@4 vuex@next vuex-persistedstate -S --registry ${registry}`, [], {
     shell: true,
     stdio: 'inherit',
     cwd: projectPath
   })
   // dev插件
-  logger.bgInfo(`npm i sass vite-svg-loader -D --registry https://registry.npm.taobao.org`)
-  spawnSync(`npm install && npm i sass vite-svg-loader -D --registry https://registry.npm.taobao.org`, [], {
+  logger.info(`npm i sass vite-svg-loader -D --registry ${registry}`)
+  spawnSync(`npm install && npm i sass vite-svg-loader -D --registry ${registry}`, [], {
     shell: true,
     stdio: 'inherit',
     cwd: projectPath
   })
   // ui库
-  inquirerStatements.addUiLibraries().then(selectedAnswers => {
+  await inquirerStatements.addUiLibraries().then(selectedAnswers => {
     console.error(selectedAnswers)
     if (selectedAnswers.indexOf('ElementPlus') !== -1) {
-      logger.bgInfo(`添加ElementPlus相关库`)
-      logger.bgInfo(`npm i element-plus -S --registry https://registry.npm.taobao.org`)
-      spawnSync(`npm i element-plus -S --registry https://registry.npm.taobao.org`, [], {
+      logger.info(`添加ElementPlus相关库`)
+      logger.info(`npm i element-plus -S --registry ${registry}`)
+      spawnSync(`npm i element-plus -S --registry ${registry}`, [], {
         shell: true,
         stdio: 'inherit',
         cwd: projectPath
       })
       fs.ensureDirSync(path.join(projectPath, 'src/components/ext/extElementPlus'))
       fs.copySync(path.join(librariesPath, 'extElementPlus/components'), path.join(projectPath, 'src/components/ext/extElementPlus'))
+    }
+    if (selectedAnswers.indexOf('Echarts') !== -1) {
+      logger.info(`添加Echarts相关库`)
+      logger.info(`npm i echarts -S --registry ${registry}`)
+      spawnSync(`npm i echarts -S --registry ${registry}`, [], {
+        shell: true,
+        stdio: 'inherit',
+        cwd: projectPath
+      })
+      fs.ensureDirSync(path.join(projectPath, 'src/components/ext/ExtEcharts'))
+      fs.copySync(path.join(librariesPath, 'ExtEcharts'), path.join(projectPath, 'src/components/ext/ExtEcharts'))
     }
   })
 }
