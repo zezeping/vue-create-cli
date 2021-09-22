@@ -1,13 +1,14 @@
 import { resolve } from 'path'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 // https://github.com/jpkleemans/vite-svg-loader
 import svgLoader from 'vite-svg-loader'
 
 // https://vitejs.dev/config/
 export default defineConfig(params => {
-  const { mode } = params
-  console.info(`--- running mode: ${mode} ---`)
+  const { command, mode } = params
+  const ENV = loadEnv(mode, process.cwd())
+  console.info(`--- running mode: ${mode}, command: ${command}, ENV: ${JSON.stringify(ENV)} ---`)
   return {
     resolve: {
       extensions: ['.json', '.js', '.vue', '.ts'],

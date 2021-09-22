@@ -4,12 +4,12 @@ import createPersistedState from 'vuex-persistedstate'
 const plugin = createPersistedState({
   storage: window.localStorage,
   key: 'storage',
-  reducer: state => {
-    return {
-      // 只保存module storage内部所有变量持久化
-      storage: state.storage
-    }
-  }
+  reducer: state => ({
+    // 整个module字段都持久化
+    storage: state.storage,
+    // 持久化部分module字段
+    // user: { userInfo: state.user.userInfo }
+  })
 })
 
 export default plugin

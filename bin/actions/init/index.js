@@ -33,8 +33,8 @@ module.exports = async function (projectName, options, command) {
   /*
   * 安装插件 axios vue-router@4 vuex@next vuex-persistedstate
   */
-  logger.info(`npm install && npm i normalize.css axios vue-router@4 vuex@next vuex-persistedstate -S --registry ${registry}`)
-  spawnSync(`npm install && npm i normalize.css axios vue-router@4 vuex@next vuex-persistedstate -S --registry ${registry}`, [], {
+  logger.info(`npm install && npm i normalize.css axios nprogress vue-router@4 vuex@next vuex-persistedstate -S --registry ${registry}`)
+  spawnSync(`npm install && npm i normalize.css axios nprogress vue-router@4 vuex@next vuex-persistedstate -S --registry ${registry}`, [], {
     shell: true,
     stdio: 'inherit',
     cwd: projectPath
