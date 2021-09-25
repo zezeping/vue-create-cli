@@ -26,7 +26,7 @@ module.exports = async function (projectName, options, command) {
     private: true,
     main: 'index.js',
     scripts: {
-      svgo: 'svgo -f src/components/ext/SvgIcon/svg'
+      svgo: 'svgo -f src/ext/shared/SvgIcon/svg'
     }
   })
   fs.writeJsonSync(path.resolve(projectPath, 'package.json'), packageJson, {spaces: 2})
@@ -40,15 +40,15 @@ module.exports = async function (projectName, options, command) {
     cwd: projectPath
   })
   // dev插件
-  logger.info(`npm i sass vite-svg-loader -D --registry ${registry}`)
-  spawnSync(`npm install && npm i sass vite-svg-loader -D --registry ${registry}`, [], {
+  logger.info(`npm i sass vite-svg-loader unplugin-vue-components -D --registry ${registry}`)
+  spawnSync(`npm install && npm i sass vite-svg-loader unplugin-vue-components -D --registry ${registry}`, [], {
     shell: true,
     stdio: 'inherit',
     cwd: projectPath
   })
   // ui库
   await inquirerStatements.addUiLibraries().then(selectedAnswers => {
-    console.error(selectedAnswers)
+    //console.error(selectedAnswers)
     if (selectedAnswers.indexOf('ElementPlus') !== -1) {
       logger.info(`添加ElementPlus相关库`)
       logger.info(`npm i element-plus -S --registry ${registry}`)
@@ -57,8 +57,19 @@ module.exports = async function (projectName, options, command) {
         stdio: 'inherit',
         cwd: projectPath
       })
-      fs.ensureDirSync(path.join(projectPath, 'src/components/ext/extElementPlus'))
-      fs.copySync(path.join(librariesPath, 'extElementPlus/components'), path.join(projectPath, 'src/components/ext/extElementPlus'))
+      fs.ensureDirSync(path.join(projectPath, 'src/components/shared/elementPlus'))
+      fs.copySync(path.join(librariesPath, 'elementPlus'), path.join(projectPath, 'src/components/shared/elementPlus'))
+    }
+    if (selectedAnswers.indexOf('AntDesignVue') !== -1) {
+      logger.info(`添加AntDesignVue相关库`)
+      logger.info(`npm i ant-design-vue@next -S --registry ${registry}`)
+      spawnSync(`npm i ant-design-vue@next -S --registry ${registry}`, [], {
+        shell: true,
+        stdio: 'inherit',
+        cwd: projectPath
+      })
+      fs.ensureDirSync(path.join(projectPath, 'src/components/shared/antDesign'))
+      fs.copySync(path.join(librariesPath, 'antDesign'), path.join(projectPath, 'src/components/shared/antDesign'))
     }
     if (selectedAnswers.indexOf('Echarts') !== -1) {
       logger.info(`添加Echarts相关库`)
@@ -68,8 +79,8 @@ module.exports = async function (projectName, options, command) {
         stdio: 'inherit',
         cwd: projectPath
       })
-      fs.ensureDirSync(path.join(projectPath, 'src/components/ext/ExtEcharts'))
-      fs.copySync(path.join(librariesPath, 'ExtEcharts'), path.join(projectPath, 'src/components/ext/ExtEcharts'))
+      fs.ensureDirSync(path.join(projectPath, 'src/components/shared/Echarts'))
+      fs.copySync(path.join(librariesPath, 'Echarts'), path.join(projectPath, 'src/components/shared/Echarts'))
     }
   })
 }

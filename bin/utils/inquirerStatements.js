@@ -9,7 +9,8 @@ module.exports = {
         name: 'uis',
         choices: [
           new inquirer.Separator(' = PC = '), // 分割线
-          { name: 'ElementPlus', checked: true, },
+          { name: 'ElementPlus', checked: false, },
+          { name: 'AntDesignVue', checked: false, },
           //new inquirer.Separator(' = WAP = '), // 分割线
           //{ name: 'Vant', },
         ],
@@ -24,7 +25,7 @@ module.exports = {
         message: '可快速集成的其他库',
         name: 'others',
         choices: [
-          { name: 'Echarts', checked: true, },
+          { name: 'Echarts', checked: false, },
         ],
         validate (answer) {
           return true

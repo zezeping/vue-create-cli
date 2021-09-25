@@ -1,5 +1,5 @@
 <template>
-  <img alt="Vue logo" src="src/assets/logo.png" />
+  <img alt="Vue logo" src="@/assets/logo.png" />
   <svg-icon name="help" style="color: red; width: 100px; height: 100px"></svg-icon>
   <HelloWorld msg="Hello Vue 3 + Vite" />
   <hr/>
@@ -29,7 +29,7 @@ import HelloWorld from './components/HelloWorld.vue'
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   //text-align: center;
-  color: #2c3e50;
-  /*margin-top: 60px;*/
+  //color: #2c3e50;
+  //margin-top: 60px;
 }
 </style>

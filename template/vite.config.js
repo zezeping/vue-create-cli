@@ -1,8 +1,15 @@
 import { resolve } from 'path'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
+// https://github.com/antfu/unplugin-vue-components
+import Components from 'unplugin-vue-components/vite'
+import { AntDesignVueResolver, ElementPlusResolver, VantResolver } from 'unplugin-vue-components/resolvers'
 // https://github.com/jpkleemans/vite-svg-loader
 import svgLoader from 'vite-svg-loader'
+
+function pathResolve() {
+  return resolve(__dirname, '.', ...arguments)
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(params => {
@@ -13,7 +20,7 @@ export default defineConfig(params => {
     resolve: {
       extensions: ['.json', '.js', '.vue', '.ts'],
       alias: {
-        '@': resolve('src')
+        '@': pathResolve('src')
       }
     },
     // https://vitejs.dev/config/#server-options
@@ -45,6 +52,13 @@ export default defineConfig(params => {
     },
     plugins: [
       vue(),
+      Components({
+        resolvers: [
+          AntDesignVueResolver({ importStyle: false }),
+          ElementPlusResolver({ importStyle: false }),
+          VantResolver({ importStyle: false })
+        ],
+      }),
       svgLoader({
         svgoConfig: {
           multipass: true

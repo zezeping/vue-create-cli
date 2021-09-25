@@ -9,7 +9,7 @@ export default {
 }
 
 /*
-import ContextMenu from "@/components/Shared/ContextMenu"
+import ContextMenu from "@/ext/Shared/ContextMenu"
 app.use(ContextMenu)
 
 <!--  <context-menu ref="contextMenu">-->

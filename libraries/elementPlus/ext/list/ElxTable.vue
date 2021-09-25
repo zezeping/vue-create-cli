@@ -28,8 +28,8 @@
 <script>
 import { useSlots, defineComponent } from 'vue'
 import { ElTable, ElTableColumn } from 'element-plus'
-import ExtPagination from './ExtPagination'
-import ExtSearchBar from './ExtSearchBar'
+import ExtPagination from './ElxPagination'
+import ExtSearchBar from './ElxSearchBar'
 export default defineComponent({
 	inheritAttrs: false,
 	components: {
@@ -191,7 +191,7 @@ export default defineComponent({
 
 <!--<template>-->
 <!--	<div class="home">-->
-<!--		<ext-table :config="tableConfig" style="width: 100%" @selection-change="selectionChange">-->
+<!--		<elx-table :config="tableConfig" style="width: 100%" @selection-change="selectionChange">-->
 <!--			&lt;!&ndash;			自定义SearchBar &ndash;&gt;-->
 <!--			&lt;!&ndash;			<template v-slot:searchBar="{queryList, config, getTableQuery}">&ndash;&gt;-->
 <!--			&lt;!&ndash;				<div>自定义SearchBar: {{ queryList }} - {{ config }} - {{ getTableQuery }}</div>&ndash;&gt;-->
@@ -216,7 +216,7 @@ export default defineComponent({
 <!--			&lt;!&ndash;		  <template v-slot:pagination="{data, mapKeys}">&ndash;&gt;-->
 <!--			&lt;!&ndash;			  <div>{{ data }} - {{ mapKeys }}</div>&ndash;&gt;-->
 <!--			&lt;!&ndash;		  </template>&ndash;&gt;-->
-<!--		</ext-table>-->
+<!--		</elx-table>-->
 <!--	</div>-->
 <!--</template>-->
 <!--<script>-->
@@ -275,7 +275,7 @@ export default defineComponent({
 <!--					{ label: '姓名', prop: 'name' },-->
 <!--					{ label: '地址', prop: 'address' },-->
 <!--				],-->
-<!--				// 优先级: (<ext-table :data="data" />) > config.data > config.fetchData()-->
+<!--				// 优先级: (<elx-table :data="data" />) > config.data > config.fetchData()-->
 <!--				//data: [-->
 <!--				//	{ date: '2016-05-02', name: '王小虎', address: '上海市普陀区金沙江路 1518 弄', },-->
 <!--				//	{ date: '2016-05-02', name: '王小虎', address: '上海市普陀区金沙江路 1518 弄', },-->

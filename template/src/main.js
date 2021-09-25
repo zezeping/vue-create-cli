@@ -5,11 +5,11 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-import extComponents from './components/ext'
+import sharedComponents from './components/shared'
 import api from './api'
 
 const app = createApp(App)
-app.use(extComponents)
+app.use(sharedComponents)
 app.use(router)
 app.use(store)
 app.use(api)

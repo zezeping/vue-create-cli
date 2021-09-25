@@ -1,5 +1,6 @@
-// import extElementPlus from './extElementPlus'
-// import ExtEcharts from './ExtEcharts'
+// import elementPlus from './elementPlus'
+// import antDesign from './antDesign'
+// import Echarts from './Echarts'
 
 // import Sticky from './Sticky'
 // import ContextMenu from './ContextMenu'
@@ -8,8 +9,9 @@ import SvgIcon from './SvgIcon'
 
 export default {
   install(app) {
-    // app.use(extElementPlus)
-    // app.use(ExtEcharts)
+    // app.use(elementPlus)
+    // app.use(antDesign)
+    // app.use(Echarts)
     
     // app.use(Sticky)
     // app.use(ContextMenu)
