@@ -1,17 +1,17 @@
 <template>
-	<div class="ext-search-bar" v-if="queryList && queryList.length">
+	<div class="elx-search-bar" v-if="queryList && queryList.length">
 		<el-form ref="formRef" :model="form" inline @submit="submit">
 			<template v-for="(query, idx) in queryList" :key="idx">
 				<slot :name="query.slot || `${query.key}Query`" :query="query">
 					<el-form-item :prop="query.key" :label="query.label" :rules="query.rules">
 						<el-input v-model="query.value" v-bind="query.attrs" v-if="query.type === 'input'"></el-input>
-						<ext-select v-model="query.value" v-bind="query.attrs" v-else-if="query.type === 'select'">
+						<elx-select v-model="query.value" v-bind="query.attrs" v-else-if="query.type === 'select'">
 							<template v-slot:default="{ options, labelKey, valueKey }">
 								<template v-for="(option, idx) in options" :key="idx">
 									<el-option :value="option[valueKey]" :label="option[labelKey]"></el-option>
 								</template>
 							</template>
-						</ext-select>
+						</elx-select>
 					</el-form-item>
 				</slot>
 			</template>
@@ -28,14 +28,14 @@
 <script>
 import { defineComponent } from 'vue'
 import { ElForm, ElFormItem, ElInput, ElSelect } from 'element-plus'
-import ExtSelect from '../form/ExtSelect'
+import ElxSelect from '../form/ElxSelect'
 export default defineComponent({
 	components: {
 		[ElForm.name]: ElForm,
 		[ElFormItem.name]: ElFormItem,
 		[ElInput.name]: ElInput,
 		[ElSelect.name]: ElSelect,
-		ExtSelect
+		ElxSelect
 	},
 	props: {
 		config: Object,

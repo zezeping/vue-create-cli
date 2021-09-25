@@ -1,5 +1,5 @@
 <template>
-	<div class="ext-table">
+	<div class="elx-table">
 		<slot name="searchBar" :queryList="tableQueryList" :config="config.searchBar" :getTableQuery="getTableQuery">
 			<ext-search-bar :queryList="tableQueryList" :config="config.searchBar" :getTableQuery="getTableQuery" @search="fetchData" @reset="resetSearch">
 				<template v-for="(slotName, idx) in querySlotNames" :key="idx" v-slot:[slotName]="{ query }">
@@ -184,7 +184,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.ext-table {
+.elx-table {
 	margin: 15px;
 }
 </style>

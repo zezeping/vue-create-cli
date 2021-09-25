@@ -1,5 +1,5 @@
 <template>
-	<el-pagination class="ext-pagination"
+	<el-pagination class="elx-pagination"
 		:layout="layout"
 		:page-sizes="pageSizes"
 		:pager-count="data[mapKeys.pageCount]"
@@ -49,7 +49,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.ext-pagination {
+.elx-pagination {
 	display: flex;
 	justify-content: flex-end;
 	margin-top: 15px;
