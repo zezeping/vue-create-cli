@@ -1,43 +1,32 @@
 <template>
-	<div class="elx-table">
+	<div class="ax-table">
 		<slot name="searchBar" :queryList="tableQueryList" :config="config.searchBar" :getTableQuery="getTableQuery">
-			<ext-search-bar :queryList="tableQueryList" :config="config.searchBar" :getTableQuery="getTableQuery" @search="fetchData" @reset="resetSearch">
+			<ax-search-bar :queryList="tableQueryList" :config="config.searchBar" :getTableQuery="getTableQuery" @search="fetchData" @reset="resetSearch">
 				<template v-for="(slotName, idx) in querySlotNames" :key="idx" v-slot:[slotName]="{ query }">
 					<slot :name="slotName" v-bind="{ query }"></slot>
 				</template>
 				<template v-slot:operations="{submit, reset}">
 					<slot name="searchBarOperations" v-bind="{submit, reset}"></slot>
 				</template>
-			</ext-search-bar>
+			</ax-search-bar>
 		</slot>
-		<el-table :data="tableData" v-loading="loading" v-bind="$attrs">
-			<template v-for="(column, idx) in tableColumns" :key="idx">
-				<el-table-column v-bind="column">
-					<template v-slot:default="{row, column: slotColumn, $index}" v-if="column.type !== 'selection'">
-						<slot :name="column.slot || `${column.prop}Column`" v-bind="{row, column: slotColumn, $index}">{{ row[column.prop] }}</slot>
-					</template>
-				</el-table-column>
+		<a-table :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :loading="loading" @change="onChange">
+			<template v-for="(column, idx) in tableColumns" :key="idx" v-slot:[column.slots.customRender]="{ record, index }">
+				 <slot :name="column.slots.customRender || `${column.dataIndex}Column`" v-bind="{ record, index, column, row: record, $index: index }">{{ record[column.dataIndex] }}</slot>
 			</template>
-		</el-table>
-		<slot name="pagination" :data="pagination" :mapKeys="mapKeys">
-			<ext-pagination :data="pagination" :mapKeys="mapKeys" :layout="config.pagination?.layout" :pageSizes="config.pagination?.pageSizes" @search="fetchData"></ext-pagination>
-		</slot>
+		</a-table>
 	</div>
 </template>
 
 <script>
 import { nextTick, computed, watch, reactive, toRefs, defineComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElTable, ElTableColumn } from 'element-plus'
-import ExtPagination from './ElxPagination'
-import ExtSearchBar from './ElxSearchBar'
+import AxSearchBar from './AxSearchBar'
+
 export default defineComponent({
 	inheritAttrs: false,
 	components: {
-		[ElTable.name]: ElTable,
-		[ElTableColumn.name]: ElTableColumn,
-		ExtPagination,
-		ExtSearchBar,
+		AxSearchBar
 	},
 	props: {
 		mapKeys: {
@@ -62,6 +51,7 @@ export default defineComponent({
 			//}
 		},
 	},
+	emits: ['change'],
 	setup (props, context) {
 		const route = useRoute()
 		const router = useRouter()
@@ -79,9 +69,15 @@ export default defineComponent({
 				[props.mapKeys.total]: 0,
 			},
 			tableQueryList: computed(() => props.config.searchBar?.queryList || state.queryList),
-			tableColumns: computed(() => props.config.columns?.filter(item => !item.hidden) || []),
-			tableData: computed(() => context.attrs.dataSource || props.config.data || state.data),
+			tableColumns: computed(() => props.config.columns?.filter(item => !item.hidden).map(item => ({slots: { customRender: `${item.dataIndex}Column` }, ...item, })) || []),
+			tableData: computed(() => {
+				const data = context.attrs.dataSource || props.config.data || state.data
+				return data.map((item, idx) => ({ key: item.id || idx, ...item}))
+			}),
+			tableRowSelection: computed(() => props.config.rowSelection),
+			tablePagination: computed(() => ({ ...state.pagination, current: state.pagination[props.mapKeys.pageNo] })),
 			slotNames: computed(() => Object.keys(context.slots)),
+			columnSlotNames: computed(() => state.slotNames.filter(item => /Column$/.test(item))),
 			querySlotNames: computed(() => state.slotNames.filter(item => /Query$/.test(item))),
 			getTableQuery() {
 				const { [props.mapKeys.pageNo]: pageNo, [props.pageSize]: pageSize, ...other } = state.pagination
@@ -95,7 +91,6 @@ export default defineComponent({
 				}, form)
 			},
 			async fetchData(query = {}) {
-				console.log(123456, query)
 				const { [props.mapKeys.pageNo]: pageNo, [props.mapKeys.pageSize]: pageSize, ...otherQuery } = query
 				const pagination =  {
 					[props.mapKeys.pageNo]: Number(pageNo || state.pagination[props.mapKeys.pageNo]),
@@ -164,29 +159,37 @@ export default defineComponent({
 		state.defaultQuery = state.getTableQuery()
 		state.fetchData({...route.query})
 
-		return { ...toRefs(state) }
+		return {
+			...toRefs(state),
+			onChange(pagination, filters, sorter, { currentDataSource }) {
+				state.pagination[props.mapKeys.pageNo] = pagination.current
+				state.pagination[props.mapKeys.pageSize] = pagination.pageSize
+				state.fetchData(state.pagination)
+				context.emit('change', ...arguments)
+			}
+		}
 	},
 })
 </script>
 
 <style lang="scss" scoped>
-.elx-table {
+.ax-table {
 	margin: 15px;
 }
 </style>
 
 <!--<template>-->
 <!--	<div class="home">-->
-<!--		<elx-table :config="tableConfig" style="width: 100%" @selection-change="selectionChange">-->
+<!--		<ax-table :config="tableConfig" style="width: 100%" @selection-change="selectionChange">-->
 <!--			&lt;!&ndash;			自定义SearchBar &ndash;&gt;-->
 <!--			&lt;!&ndash;			<template v-slot:searchBar="{queryList, config, getTableQuery}">&ndash;&gt;-->
 <!--			&lt;!&ndash;				<div>自定义SearchBar: {{ queryList }} - {{ config }} - {{ getTableQuery }}</div>&ndash;&gt;-->
 <!--			&lt;!&ndash;			</template>&ndash;&gt;-->
 <!--			&lt;!&ndash;searchBar query item slot`&ndash;&gt;-->
 <!--			<template v-slot:nameQuery="{query}">-->
-<!--				<el-form-item :prop="query.key" :rules="query.rules" :label="query.label">-->
-<!--					<el-input v-model="query.value" :placeholder="query.attrs.placeholder"></el-input>-->
-<!--				</el-form-item>-->
+<!--				<a-form-item :name="query.key" :rules="query.rules" :label="query.label">-->
+<!--					<a-input v-model="query.value" :placeholder="query.attrs.placeholder"></a-input>-->
+<!--				</a-form-item>-->
 <!--			</template>-->
 <!--			&lt;!&ndash;		  自定义searchBar 按钮组&ndash;&gt;-->
 <!--			&lt;!&ndash;		  <template v-slot:searchBarOperations="{submit, reset}">&ndash;&gt;-->
@@ -202,7 +205,7 @@ export default defineComponent({
 <!--			&lt;!&ndash;		  <template v-slot:pagination="{data, mapKeys}">&ndash;&gt;-->
 <!--			&lt;!&ndash;			  <div>{{ data }} - {{ mapKeys }}</div>&ndash;&gt;-->
 <!--			&lt;!&ndash;		  </template>&ndash;&gt;-->
-<!--		</elx-table>-->
+<!--		</ax-table>-->
 <!--	</div>-->
 <!--</template>-->
 <!--<script>-->
@@ -211,7 +214,7 @@ export default defineComponent({
 <!--		return {-->
 <!--			tableConfig: {-->
 <!--				searchBar: {-->
-<!--					inline: true,-->
+<!--					layout: 'inline',-->
 <!--					queryList: [-->
 <!--						{ key: 'name', value: '', label: '手机号', type: 'input',-->
 <!--							rules: [{ required: true, message: '请输入手机号', trigger: ['blur', 'change'] }],-->
@@ -219,7 +222,7 @@ export default defineComponent({
 <!--						},-->
 <!--						{-->
 <!--							key: 'gender', value: '', label: '性别', type: 'select',-->
-<!--							attrs: { placeholder: '请选择性别', options: [{label: '男', value: 'male'}, {label: '女', value: 'female'}], },-->
+<!--							attrs: { placeholder: '请选择性别', options: [{label: '男', value: 'male'}, {label: '女', value: 'female'}], style: { 'min-width': '500px' }, },-->
 <!--						},-->
 <!--						{ key: 'isAdult', value: '', label: '是否成年', type: 'select',-->
 <!--							attrs: { placeholder: '请选择类型', clearable: true, options: [{label: '成年', value: 'true'}, {label: '未成年', value: 'false'}], },-->
@@ -249,7 +252,7 @@ export default defineComponent({
 <!--								pageSize: query.pageSize || 10,-->
 <!--								total: 99,-->
 <!--								list: [-->
-<!--									{ date: '2016-05-02', name: '王小虎', address: '上海市普陀区金沙江路 1518 弄', },-->
+<!--									{ date: '2016-05-02', name: '王小虎', address: '上海市普陀区金沙江路 1518 弄', key: 10 },-->
 <!--									{ date: '2016-05-02', name: '王小虎', address: '上海市普陀区金沙江路 1518 弄', },-->
 <!--								]-->
 <!--							},-->
@@ -257,10 +260,10 @@ export default defineComponent({
 <!--					}, 3000)-->
 <!--				}),-->
 <!--				columns: [-->
-<!--					{ type: 'selection', width: 55 },-->
-<!--					{ label: '日期', prop: 'date' },-->
-<!--					{ label: '姓名', prop: 'name' },-->
-<!--					{ label: '地址', prop: 'address' },-->
+<!--					//{ type: 'selection', width: 55 },-->
+<!--					{ title: '日期', dataIndex: 'date', },-->
+<!--					{ title: '姓名', dataIndex: 'name', },-->
+<!--					{ title: '地址', dataIndex: 'address', },-->
 <!--				],-->
 <!--				// 优先级: (<elx-table :data="data" />) > config.data > config.fetchData()-->
 <!--				//data: [-->
@@ -277,4 +280,3 @@ export default defineComponent({
 <!--	}-->
 <!--}-->
 <!--</script>-->
-

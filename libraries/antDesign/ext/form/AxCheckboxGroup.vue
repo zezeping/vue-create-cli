@@ -1,22 +1,22 @@
 <template>
-	<el-select>
+	<a-checkbox-group>
 		<template v-slot>
 			<slot v-bind="{...$attrs, ...props}">
 				<template v-for="(item, idx) in options" :key="idx">
-					<el-option  :label="item[labelKey]" :value="item[valueKey]"></el-option>
+					<a-checkbox :value="item[valueKey]">{{ item[labelKey] }}</a-checkbox>
 				</template>
 			</slot>
 		</template>
-	</el-select>
+	</a-checkbox-group>
 </template>
 
 <script>
 import { defineComponent } from 'vue'
-import { ElSelect, ElOption } from 'element-plus'
+import { ElCheckbox, ElCheckboxGroup } from 'element-plus'
 export default defineComponent({
 	components: {
-		ElSelect,
-		ElOption
+		ElCheckbox,
+		ElCheckboxGroup
 	},
 	props: {
 		labelKey: {

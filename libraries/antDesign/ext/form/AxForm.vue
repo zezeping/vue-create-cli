@@ -1,35 +1,40 @@
 <template>
-	<el-form class="elx-form" :model="formModel" v-bind="{...$attrs, ...omitKeys(config, ['model', 'fields'])}" ref="formRef">
+	<a-form class="ax-form" :model="formModel" v-bind="{...$attrs, ...omitKeys(config, ['model', 'fields'])}" ref="formRef">
 		<template v-for="(field, idx) in config.fields" :key="idx">
-			<slot :name="field.prop" v-bind="{ field }">
-				<el-form-item v-bind="omitKeys(field, ['type', 'attrs'])">
-					<component :is="field.type" v-model="field.value" v-bind="field.attrs"></component>
-				</el-form-item>
+			<slot :name="field.name" v-bind="{ field }">
+				<a-form-item v-bind="omitKeys(field, ['type', 'attrs'])">
+					<template v-if="'a-checkbox' === field.type">
+						<component is="a-checkbox" v-model:checked="field.value" v-bind="omitKeys(field.attrs, ['label'])">{{ field.attrs.label || field.value }}</component>
+					</template>
+					<template v-else>
+						<component :is="field.type" v-model:value="field.value" v-bind="field.attrs"></component>
+					</template>
+				</a-form-item>
 			</slot>
 		</template>
-		<slot name="operations" v-bind="{ config, onSubmit, onReset, config }">
-			<el-form-item v-bind="omitKeys(config.operations, ['onSubmit', 'onReset', 'onCancel'])">
-				<el-button type="primary" @click="onSubmit">提交</el-button>
-				<el-button @click="onReset">重置</el-button>
-			</el-form-item>
+		<slot name="operations" v-bind="{ config, onSubmit, onReset }">
+			<a-form-item v-bind="omitKeys(config.operations, ['onSubmit', 'onReset', 'onCancel'])">
+				<a-button type="primary" @click="onSubmit">提交</a-button>
+				<a-button @click="onReset" style="margin-left: 10px">重置</a-button>
+			</a-form-item>
 		</slot>
-	</el-form>
+	</a-form>
 </template>
 
 <script>
-import { reactive, toRefs, defineComponent, computed, nextTick } from 'vue'
-import { ElInput, ElSelect, ElCheckbox } from 'element-plus'
+import { computed, reactive, toRefs, nextTick } from 'vue'
+import { Input, Select, Checkbox } from 'ant-design-vue'
 import { useOmitKeys } from '@/utils/hooks/useObject'
-import ElxSelect from './ElxSelect'
-import ElxCheckboxGroup from './ElxCheckboxGroup'
-export default defineComponent({
+import AxSelect from './AxSelect'
+import AxCheckboxGroup from './AxCheckboxGroup'
+export default {
 	inheritAttrs: false,
 	components: {
-		ElInput,
-		ElSelect,
-		ElCheckbox,
-		ElxSelect,
-		ElxCheckboxGroup,
+		[Input.name]: Input,
+		[Select.name]: Select,
+		[Checkbox.name]: Checkbox,
+		AxSelect,
+		AxCheckboxGroup,
 	},
 	props: {
 		// keys: model, fields
@@ -45,16 +50,16 @@ export default defineComponent({
 			formModel: computed(() => {
 				const form = props.config.model || {}
 				for (const field of (props.config.fields || [])) {
-					form[field.prop] = typeof field.getValue === 'function' ? field.getValue(field, form) : field.value
+					form[field.name] = typeof field.getValue === 'function' ? field.getValue(field, form) : field.value
 				}
 				return {...state.defaultFormModel, ...form}
 			}),
 			setDefaultFormModel(defaultFormModel) {
 				for (const field of props.config.fields) {
 					if (typeof field.setValue === 'function') {
-						field.setValue(field, defaultFormModel[field.prop], defaultFormModel)
+						field.setValue(field, defaultFormModel[field.name], defaultFormModel)
 					} else {
-						field.value = defaultFormModel[field.prop]
+						field.value = defaultFormModel[field.name]
 					}
 				}
 				state.defaultFormModel = defaultFormModel
@@ -65,10 +70,8 @@ export default defineComponent({
 			...toRefs(state),
 			omitKeys: useOmitKeys(),
 			onSubmit() {
-				state.formRef.validate((valid) => {
-					if (valid) {
-						props.config.operations?.onSubmit({...state.formModel})
-					}
+				state.formRef.validate().then(() => {
+					props.config.operations?.onSubmit({...state.formModel})
 				})
 			},
 			onReset() {
@@ -79,12 +82,12 @@ export default defineComponent({
 			}
 		}
 	}
-})
+}
 </script>
 
 <!--<template>-->
 <!--	<div class="home">-->
-<!--		<elx-form :config="formConfig" ref="formRef"></elx-form>-->
+<!--		<ax-form :config="formConfig" ref="formRef"></ax-form>-->
 <!--	</div>-->
 <!--</template>-->
 <!--<script>-->
@@ -93,20 +96,20 @@ export default defineComponent({
 <!--	setup (props, context) {-->
 <!--		const state = reactive({-->
 <!--			formConfig: {-->
-<!--				labelWidth: '120px',-->
+<!--				labelCol: { span: 2 },-->
 <!--				fields: [-->
 <!--					{-->
-<!--						prop: 'username', value: '',-->
+<!--						name: 'username', value: '',-->
 <!--						label: '用户名', width: '100px',-->
-<!--						type: 'el-input',-->
+<!--						type: 'a-input',-->
 <!--						rules: [{required: true, message: '请输入手机号', trigger: ['change', 'blur']}],-->
 <!--						attrs: {-->
 <!--							placeholder: '请输入用户名',-->
 <!--						}-->
 <!--					}, {-->
-<!--						prop: 'loveFruits', value: [],-->
+<!--						name: 'loveFruits', value: [],-->
 <!--						label: '喜欢的水果', width: '100px',-->
-<!--						type: 'elx-checkbox-group',-->
+<!--						type: 'ax-checkbox-group',-->
 <!--						attrs: {-->
 <!--							options: [-->
 <!--								{ label: '苹果', value: 'apple' },-->
@@ -114,13 +117,14 @@ export default defineComponent({
 <!--							]-->
 <!--						}-->
 <!--					}, {-->
-<!--						prop: 'rememberMe', value: true,-->
+<!--						name: 'rememberMe', value: true,-->
 <!--						label: '记住我',-->
-<!--						type: 'el-checkbox',-->
+<!--						type: 'a-checkbox',-->
 <!--						attrs: { label: '记住' }-->
 <!--					}-->
 <!--				],-->
 <!--				operations: {-->
+<!--					wrapperCol: { offset: 2 },-->
 <!--				}-->
 <!--			},-->
 <!--		})-->

@@ -1,40 +1,35 @@
 <template>
-	<el-form class="elx-search-bar" ref="formRef" :model="form" @submit="submit" v-bind="omitKeys(config, ['queryList'])" v-if="queryList && queryList.length">
+	<a-form class="ax-search-bar" ref="formRef" :model="form" @submit="submit" v-bind="omitKeys(config, ['queryList'])" v-if="queryList && queryList.length">
 		<template v-for="(query, idx) in queryList" :key="idx">
 			<slot :name="query.slot || `${query.key}Query`" :query="query">
-				<el-form-item :prop="query.key" :label="query.label" :rules="query.rules">
-					<el-input v-model="query.value" v-bind="query.attrs" v-if="query.type === 'input'"></el-input>
-					<elx-select v-model="query.value" v-bind="query.attrs" v-else-if="query.type === 'select'">
+				<a-form-item :name="query.key" :label="query.label" :rules="query.rules">
+					<a-input v-model="query.value" v-bind="query.attrs" v-if="query.type === 'input'"></a-input>
+					<ax-select v-model="query.value" v-bind="query.attrs" v-else-if="query.type === 'select'">
 						<template v-slot:default="{ options, labelKey, valueKey }">
 							<template v-for="(option, idx) in options" :key="idx">
-								<el-option :value="option[valueKey]" :label="option[labelKey]"></el-option>
+								<a-select-option :value="option[valueKey]">{{ option[labelKey] }}</a-select-option>
 							</template>
 						</template>
-					</elx-select>
-				</el-form-item>
+					</ax-select>
+				</a-form-item>
 			</slot>
 		</template>
-		<el-form-item>
+		<a-form-item>
 			<slot name="operations" :submit="submit" :reset="reset">
 				<el-button type="primary" @click="submit">搜索</el-button>
 				<el-button @click="reset">重置</el-button>
 			</slot>
-		</el-form-item>
-	</el-form>
+		</a-form-item>
+	</a-form>
 </template>
 
 <script>
 import { defineComponent } from 'vue'
-import { ElForm, ElFormItem, ElInput, ElSelect } from 'element-plus'
 import { useOmitKeys } from '@/utils/hooks/useObject'
-import ElxSelect from '../form/ElxSelect'
+import AxSelect from '../form/AxSelect'
 export default defineComponent({
 	components: {
-		[ElForm.name]: ElForm,
-		[ElFormItem.name]: ElFormItem,
-		[ElInput.name]: ElInput,
-		[ElSelect.name]: ElSelect,
-		ElxSelect
+		AxSelect
 	},
 	props: {
 		config: Object,
@@ -47,17 +42,17 @@ export default defineComponent({
 			omitKeys: useOmitKeys()
 		}
 	},
-	computed: {
+ 	computed: {
 		form() {
 			return this.getTableQuery()
 		}
 	},
 	methods: {
 		submit() {
-			this.$refs['formRef'].validate((valid) => {
-				if (valid) {
-					this.$emit('search', this.form)
-				}
+			this.$refs['formRef'].validate().then(() => {
+				this.$emit('search', this.form)
+			}).catch(e => {
+				console.log(e)
 			})
 		},
 		reset() {
