@@ -1,5 +1,5 @@
 <template>
-	<div class="ext-echarts" ref="chartRef"></div>
+	<div class="echarts" ref="chartRef"></div>
 </template>
 
 <script>
@@ -63,7 +63,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.ext-echarts {
+.echarts {
 	position: relative;
 	width: 100%;
 	height: 100%;

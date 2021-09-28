@@ -39,6 +39,8 @@ export default defineConfig(params => {
           changOrigin: true // 配置跨域
           // ws: true, // 配置ws跨域
           // secure: false, // https协议才设置
+          // loglevel: 'debug',
+          // rewrite: path => path.replace(/^\/api/, '')
         }
       }
     },

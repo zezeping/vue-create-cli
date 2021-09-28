@@ -1,9 +1,11 @@
 <template>
 	<el-form class="elx-form" :model="formModel" v-bind="{...$attrs, ...omitKeys(config, ['model', 'fields'])}" ref="formRef">
 		<template v-for="(field, idx) in config.fields" :key="idx">
-			<slot :name="field.prop" v-bind="{ field }">
+			<slot :name="`${field.prop}FormItem`" v-bind="{ field }">
 				<el-form-item v-bind="omitKeys(field, ['type', 'attrs'])">
-					<component :is="field.type" v-model="field.value" v-bind="field.attrs"></component>
+					<slot :name="field.prop" v-bind="{ field }">
+						<component :is="field.type" v-model="field.value" v-bind="field.attrs"></component>
+					</slot>
 				</el-form-item>
 			</slot>
 		</template>
@@ -38,8 +40,9 @@ export default defineComponent({
 			required: true
 		}
 	},
-	setup(props) {
+	setup(props, context) {
 		const state = reactive({
+			slotKeys: Object.keys(context.slots),
 			formRef: null,
 			defaultFormModel: null,
 			formModel: computed(() => {
@@ -84,7 +87,14 @@ export default defineComponent({
 
 <!--<template>-->
 <!--	<div class="home">-->
-<!--		<elx-form :config="formConfig" ref="formRef"></elx-form>-->
+<!--		<elx-form :config="formConfig" ref="formRef">-->
+<!--&lt;!&ndash;			<template v-slot:usernameFormItem="{ field }">&ndash;&gt;-->
+<!--&lt;!&ndash;				自定义FormItem{{ field }}&ndash;&gt;-->
+<!--&lt;!&ndash;			</template>&ndash;&gt;-->
+<!--&lt;!&ndash;			<template v-slot:username="{field}">&ndash;&gt;-->
+<!--&lt;!&ndash;				自定义input: {{ field }}&ndash;&gt;-->
+<!--&lt;!&ndash;			</template>&ndash;&gt;-->
+<!--		</elx-form>-->
 <!--	</div>-->
 <!--</template>-->
 <!--<script>-->
@@ -126,6 +136,9 @@ export default defineComponent({
 <!--		})-->
 <!--		return { ...toRefs(state) }-->
 <!--	},-->
+<!--	mounted() {-->
+<!--		this.$apiAxios.get('http://baidu2.com/api/paht').catch(er => console.log(er, 33))-->
+<!--	}-->
 <!--})-->
 <!--</script>-->
 <!--<style lang="scss" scoped>-->

@@ -1,14 +1,16 @@
 <template>
 	<a-form class="ax-form" :model="formModel" v-bind="{...$attrs, ...omitKeys(config, ['model', 'fields'])}" ref="formRef">
 		<template v-for="(field, idx) in config.fields" :key="idx">
-			<slot :name="field.name" v-bind="{ field }">
+			<slot :name="`${field.name}FormItem`" v-bind="{ field }">
 				<a-form-item v-bind="omitKeys(field, ['type', 'attrs'])">
-					<template v-if="'a-checkbox' === field.type">
-						<component is="a-checkbox" v-model:checked="field.value" v-bind="omitKeys(field.attrs, ['label'])">{{ field.attrs.label || field.value }}</component>
-					</template>
-					<template v-else>
-						<component :is="field.type" v-model:value="field.value" v-bind="field.attrs"></component>
-					</template>
+					<slot :name="field.name" v-bind="{ field }">
+						<template v-if="'a-checkbox' === field.type">
+							<component is="a-checkbox" v-model:checked="field.value" v-bind="omitKeys(field.attrs, ['label'])">{{ field.attrs.label || field.value }}</component>
+						</template>
+						<template v-else>
+							<component :is="field.type" v-model:value="field.value" v-bind="field.attrs"></component>
+						</template>
+					</slot>
 				</a-form-item>
 			</slot>
 		</template>
@@ -87,7 +89,14 @@ export default {
 
 <!--<template>-->
 <!--	<div class="home">-->
-<!--		<ax-form :config="formConfig" ref="formRef"></ax-form>-->
+<!--		<ax-form :config="formConfig" ref="formRef">-->
+<!--			&lt;!&ndash;			<template v-slot:usernameFormItem="{ field }">&ndash;&gt;-->
+<!--			&lt;!&ndash;				自定义FormItem{{ field }}&ndash;&gt;-->
+<!--			&lt;!&ndash;			</template>&ndash;&gt;-->
+<!--			&lt;!&ndash;			<template v-slot:username="{field}">&ndash;&gt;-->
+<!--			&lt;!&ndash;				自定义input: {{ field }}&ndash;&gt;-->
+<!--			&lt;!&ndash;			</template>&ndash;&gt;-->
+<!--		</ax-form>-->
 <!--	</div>-->
 <!--</template>-->
 <!--<script>-->
