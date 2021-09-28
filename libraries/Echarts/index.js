@@ -1,7 +1,7 @@
-import ExtEcharts from './ExtEcharts'
+import Echarts from './Echarts'
 
 export default {
   install(app) {
-    app.component('ExtEcharts', ExtEcharts)
+    app.component('Echarts', Echarts)
   }
 }

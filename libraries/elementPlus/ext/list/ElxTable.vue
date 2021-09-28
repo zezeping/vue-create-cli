@@ -1,14 +1,14 @@
 <template>
 	<div class="elx-table">
 		<slot name="searchBar" :queryList="tableQueryList" :config="config.searchBar" :getTableQuery="getTableQuery">
-			<ext-search-bar :queryList="tableQueryList" :config="config.searchBar" :getTableQuery="getTableQuery" @search="fetchData" @reset="resetSearch">
+			<elx-search-bar :queryList="tableQueryList" :config="config.searchBar" :getTableQuery="getTableQuery" @search="fetchData" @reset="resetSearch">
 				<template v-for="(slotName, idx) in querySlotNames" :key="idx" v-slot:[slotName]="{ query }">
 					<slot :name="slotName" v-bind="{ query }"></slot>
 				</template>
 				<template v-slot:operations="{submit, reset}">
 					<slot name="searchBarOperations" v-bind="{submit, reset}"></slot>
 				</template>
-			</ext-search-bar>
+			</elx-search-bar>
 		</slot>
 		<el-table :data="tableData" v-loading="loading" v-bind="$attrs">
 			<template v-for="(column, idx) in tableColumns" :key="idx">
@@ -20,7 +20,7 @@
 			</template>
 		</el-table>
 		<slot name="pagination" :data="pagination" :mapKeys="mapKeys">
-			<ext-pagination :data="pagination" :mapKeys="mapKeys" :layout="config.pagination?.layout" :pageSizes="config.pagination?.pageSizes" @search="fetchData"></ext-pagination>
+			<elx-pagination :data="pagination" :mapKeys="mapKeys" :layout="config.pagination?.layout" :pageSizes="config.pagination?.pageSizes" @search="fetchData"></elx-pagination>
 		</slot>
 	</div>
 </template>
@@ -29,15 +29,15 @@
 import { nextTick, computed, watch, reactive, toRefs, defineComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElTable, ElTableColumn } from 'element-plus'
-import ExtPagination from './ElxPagination'
-import ExtSearchBar from './ElxSearchBar'
+import ElxPagination from './ElxPagination'
+import ElxSearchBar from './ElxSearchBar'
 export default defineComponent({
 	inheritAttrs: false,
 	components: {
 		[ElTable.name]: ElTable,
 		[ElTableColumn.name]: ElTableColumn,
-		ExtPagination,
-		ExtSearchBar,
+		ElxPagination,
+		ElxSearchBar,
 	},
 	props: {
 		mapKeys: {
