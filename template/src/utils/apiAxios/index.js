@@ -10,6 +10,12 @@ const apiAxios = axios.create({
 })
 apiAxios.CancelToken = axios.CancelToken
 apiAxios.isCancel = axios.isCancel
+apiAxios.defaults.meta = {
+  // 请求重试
+  retry: 3/*times*/, retryDelay: 5000/*ms*/, curRetry: 0/*times*/,
+  // 断开相同请求，判断条件 如果!!cancelToken存在则计算config.url+cancelToken的值作为唯一key值，key值相同，则断开之前请求
+  cancelToken: '',
+}
 // 设置 post 请求头
 apiAxios.defaults.headers.post['Content-Type'] = 'application/json'
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -35,6 +41,17 @@ apiAxios.interceptors.response.use(res => {
   // 请求失败
   if (axios.isCancel(error)) {
     console.error('主动取消')
+  } else {
+    const config = error.config
+    if (config.meta && config.meta.curRetry !== config.meta.retry) {
+      config.meta.curRetry++
+      return new Promise(resolve => {
+        setTimeout(() => {
+          console.warn(`${config.url},请求重试: ${config.meta.curRetry}次`)
+          resolve(apiAxios(config))
+        }, config.meta.retryDelay, 1000)
+      })
+    }
   }
   return Promise.reject(error)
 })
