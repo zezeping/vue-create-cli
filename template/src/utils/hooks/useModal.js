@@ -1,27 +1,54 @@
-import { h, reactive, defineComponent, createApp, nextTick } from 'vue'
+import {
+  createApp,
+  getCurrentInstance,
+  onUnmounted,
+  h,
+  reactive,
+  defineComponent,
+  watch,
+  nextTick,
+  createVNode,
+} from 'vue'
 import { Modal } from 'ant-design-vue'
+import New from '../../views/repositories/New'
 
 const createAntDesignModal = (options) => {
   const { slots, ...otherOptions } = options
-  let instance = null
+  let appInstance = null
+  let componentInstance = null
   const div = document.createElement('div')
   document.body.appendChild(div)
   const ModalComponent = defineComponent({
-    setup() {
+    props: {
+      afterClose: Function,
+    },
+    emits: ['afterClose'],
+    setup(props, ctx) {
+      componentInstance = getCurrentInstance()
       const modalOptions = reactive({
         visible: true,
+        ...otherOptions,
         'onUpdate:visible': value => {
+          if (typeof otherOptions['onUpdate:visible'] === 'function') {
+            otherOptions['onUpdate:visible']()
+          }
           if (!value) {
             modalOptions.visible = false
-            nextTick(() => {
-              instance.unmount()
-              div.parentNode.removeChild(div)
-            })
           }
         },
-        ...otherOptions
+        afterClose() {
+          if (typeof otherOptions.onAfterClose === 'function') {
+            otherOptions.onAfterClose()
+          }
+          props.afterClose()
+        }
       })
       const modalSlots = reactive({...slots})
+      
+      onUnmounted(() => {
+        div.parentNode?.removeChild(div)
+      })
+      
       return {
         modalOptions,
         modalSlots
@@ -31,19 +58,33 @@ const createAntDesignModal = (options) => {
       return h(Modal, this.modalOptions, this.modalSlots)
     }
   })
-  instance = createApp(ModalComponent)
-  instance.mount(div)
-  return instance
+  appInstance = createApp(ModalComponent, {
+    afterClose() {
+      appInstance.unmount()
+    }
+  })
+  appInstance.mount(div)
+  appInstance.close = () => {
+    componentInstance.ctx.modalOptions.visible = false
+  }
+  return appInstance
 }
 
-/* usage
- //import { useModal } from '@/utils/hooks/useModal'
- //const instance = useModal({
- //  slots: {
- //    default: () => createVNode(Hello)
- //  }
- //})
- */
+/* usage */
+//import { createVNode } from 'vue'
+//const instance = useModal({
+//  title: '新建仓库',
+//  footer: null,
+//  slots: {
+//    default: () => createVNode(New, {
+//      onCancel: () => {
+//        //instance.unmount() // 直接移除
+//        instance.close() // 弹出框完全关闭后移除
+//      }
+//    })
+//  }
+//})
+
 export const useModal = (options) => {
-  createAntDesignModal(options)
+  return createAntDesignModal(options)
 }

@@ -40,7 +40,7 @@ module.exports = async function (projectName, options, command) {
     cwd: projectPath
   })
   // dev插件
-  logger.info(`npm i sass vite-svg-loader unplugin-vue-components -D --registry ${registry}`)
+  logger.info(`npm i sass vite-svg-loader unplugin-vue-components @vitejs/plugin-vue-jsx -D --registry ${registry}`)
   spawnSync(`npm install && npm i sass vite-svg-loader unplugin-vue-components -D --registry ${registry}`, [], {
     shell: true,
     stdio: 'inherit',

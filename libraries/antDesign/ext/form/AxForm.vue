@@ -1,31 +1,36 @@
 <template>
-	<a-form class="ax-form" :model="formModel" v-bind="{...$attrs, ...omitKeys(config, ['model', 'fields'])}" ref="formRef">
-		<template v-for="(field, idx) in config.fields" :key="idx">
-			<slot :name="`${field.name}FormItem`" v-bind="{ field }">
-				<a-form-item v-bind="omitKeys(field, ['type', 'attrs'])">
-					<slot :name="field.name" v-bind="{ field }">
-						<template v-if="'a-checkbox' === field.type">
-							<component is="a-checkbox" v-model:checked="field.value" v-bind="omitKeys(field.attrs, ['label'])">{{ field.attrs.label || field.value }}</component>
-						</template>
-						<template v-else>
-							<component :is="field.type" v-model:value="field.value" v-bind="field.attrs"></component>
-						</template>
+	<a-form class="ax-form" :model="formModel" v-bind="{...$attrs, ...omitKeys(config, ['model', 'formItems'])}" ref="formRef">
+		<slot>
+			<template v-for="(field, idx) in config.formItems" :key="idx">
+				<slot :name="`${field.name}FormItem`" v-bind="{ field }">
+					<a-form-item v-bind="omitKeys(field, ['type', 'attrs'])">
+						<slot :name="field.name" v-bind="{ field }">
+							<template v-if="'a-checkbox' === field.type">
+								<component is="a-checkbox" v-model:checked="field.value" v-bind="omitKeys(field.attrs, ['label'])">{{ field.attrs.label || field.value }}</component>
+							</template>
+							<template v-else>
+								<component :is="field.type" v-model:value="field.value" v-bind="field.attrs"></component>
+							</template>
+						</slot>
+					</a-form-item>
+				</slot>
+			</template>
+			<slot name="operationsFormItem" v-bind="{ config, onSubmit, onReset, onCancel, formItemConfig: omitKeys(config.operationsFormItem, ['onSubmit', 'onReset', 'onCancel']) }">
+				<a-form-item class="operations-form-item" v-bind="config.operationsFormItem">
+					<slot name="operations" v-bind="{ config, onSubmit, onReset, onCancel }">
+						<a-button type="primary" @click="onSubmit" style="margin: 0 5px;">提交</a-button>
+						<a-button @click="onCancel" style="margin: 0 5px;">取消</a-button>
+						<a-button @click="onReset" style="margin: 0 5px;">重置</a-button>
 					</slot>
 				</a-form-item>
 			</slot>
-		</template>
-		<slot name="operations" v-bind="{ config, onSubmit, onReset }">
-			<a-form-item v-bind="omitKeys(config.operations, ['onSubmit', 'onReset', 'onCancel'])">
-				<a-button type="primary" @click="onSubmit">提交</a-button>
-				<a-button @click="onReset" style="margin-left: 10px">重置</a-button>
-			</a-form-item>
 		</slot>
 	</a-form>
 </template>
 
 <script>
 import { computed, reactive, toRefs, nextTick } from 'vue'
-import { Input, Select, Checkbox } from 'ant-design-vue'
+import { Input, Select, Checkbox, Textarea } from 'ant-design-vue'
 import { useOmitKeys } from '@/utils/hooks/useObject'
 import AxSelect from './AxSelect'
 import AxCheckboxGroup from './AxCheckboxGroup'
@@ -35,29 +40,35 @@ export default {
 		[Input.name]: Input,
 		[Select.name]: Select,
 		[Checkbox.name]: Checkbox,
+		[Textarea.name]: Textarea,
 		AxSelect,
 		AxCheckboxGroup,
 	},
 	props: {
-		// keys: model, fields
+		// keys: formItems
 		config: {
 			type: Object,
-			required: true
+			default: () => ({})
 		}
 	},
-	setup(props) {
+	emits: ['submit', 'reset', 'cancel'],
+	setup(props, context) {
 		const state = reactive({
 			formRef: null,
 			defaultFormModel: null,
+			validate: () => state.formRef.validate(),
 			formModel: computed(() => {
+				if (context.attrs.model) {
+					return context.attrs.model
+				}
 				const form = props.config.model || {}
-				for (const field of (props.config.fields || [])) {
+				for (const field of (props.config.formItems || [])) {
 					form[field.name] = typeof field.getValue === 'function' ? field.getValue(field, form) : field.value
 				}
 				return {...state.defaultFormModel, ...form}
 			}),
 			setDefaultFormModel(defaultFormModel) {
-				for (const field of props.config.fields) {
+				for (const field of (props.config.formItems || [])) {
 					if (typeof field.setValue === 'function') {
 						field.setValue(field, defaultFormModel[field.name], defaultFormModel)
 					} else {
@@ -73,14 +84,18 @@ export default {
 			omitKeys: useOmitKeys(),
 			onSubmit() {
 				state.formRef.validate().then(() => {
-					props.config.operations?.onSubmit({...state.formModel})
+					context.emit('submit', {...state.formModel})
 				})
 			},
 			onReset() {
 				state.setDefaultFormModel(state.defaultFormModel)
 				nextTick(() => {
 					state.formRef.resetFields()
+					context.emit('reset')
 				})
+			},
+			onCancel() {
+				context.emit('cancel')
 			}
 		}
 	}
@@ -106,7 +121,7 @@ export default {
 <!--		const state = reactive({-->
 <!--			formConfig: {-->
 <!--				labelCol: { span: 2 },-->
-<!--				fields: [-->
+<!--				formItems: [-->
 <!--					{-->
 <!--						name: 'username', value: '',-->
 <!--						label: '用户名', width: '100px',-->
@@ -132,7 +147,7 @@ export default {
 <!--						attrs: { label: '记住' }-->
 <!--					}-->
 <!--				],-->
-<!--				operations: {-->
+<!--				operationsFormItem: {-->
 <!--					wrapperCol: { offset: 2 },-->
 <!--				}-->
 <!--			},-->

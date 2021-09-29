@@ -1,19 +1,24 @@
 <template>
-	<el-form class="elx-form" :model="formModel" v-bind="{...$attrs, ...omitKeys(config, ['model', 'fields'])}" ref="formRef">
-		<template v-for="(field, idx) in config.fields" :key="idx">
-			<slot :name="`${field.prop}FormItem`" v-bind="{ field }">
-				<el-form-item v-bind="omitKeys(field, ['type', 'attrs'])">
-					<slot :name="field.prop" v-bind="{ field }">
-						<component :is="field.type" v-model="field.value" v-bind="field.attrs"></component>
+	<el-form class="elx-form" :model="formModel" v-bind="{...$attrs, ...omitKeys(config, ['model', 'formItems'])}" ref="formRef">
+		<slot>
+			<template v-for="(field, idx) in config.formItems" :key="idx">
+				<slot :name="`${field.prop}FormItem`" v-bind="{ field }">
+					<el-form-item v-bind="omitKeys(field, ['type', 'attrs'])">
+						<slot :name="field.prop" v-bind="{ field }">
+							<component :is="field.type" v-model="field.value" v-bind="field.attrs"></component>
+						</slot>
+					</el-form-item>
+				</slot>
+			</template>
+			<slot name="operationsFormItem" v-bind="{ config, onSubmit, onReset, config }">
+				<el-form-item v-bind="config.operationsField">
+					<slot name="operations" v-bind="{ config, onSubmit, onReset, onCancel }">
+						<el-button type="primary" @click="onSubmit">提交</el-button>
+						<el-button @click="onCancel">取消</el-button>
+						<el-button @click="onReset">重置</el-button>
 					</slot>
 				</el-form-item>
 			</slot>
-		</template>
-		<slot name="operations" v-bind="{ config, onSubmit, onReset, config }">
-			<el-form-item v-bind="omitKeys(config.operations, ['onSubmit', 'onReset', 'onCancel'])">
-				<el-button type="primary" @click="onSubmit">提交</el-button>
-				<el-button @click="onReset">重置</el-button>
-			</el-form-item>
 		</slot>
 	</el-form>
 </template>
@@ -34,26 +39,31 @@ export default defineComponent({
 		ElxCheckboxGroup,
 	},
 	props: {
-		// keys: model, fields
+		// keys: model, formItems
 		config: {
 			type: Object,
 			required: true
 		}
 	},
+	emits: ['submit', 'reset', 'cancel'],
 	setup(props, context) {
 		const state = reactive({
 			slotKeys: Object.keys(context.slots),
 			formRef: null,
 			defaultFormModel: null,
 			formModel: computed(() => {
+				if (context.attrs.model) {
+					return context.attrs.model
+				}
 				const form = props.config.model || {}
-				for (const field of (props.config.fields || [])) {
+				for (const field of (props.config.formItems || [])) {
 					form[field.prop] = typeof field.getValue === 'function' ? field.getValue(field, form) : field.value
 				}
 				return {...state.defaultFormModel, ...form}
 			}),
+			validate: () => state.formRef.validate(),
 			setDefaultFormModel(defaultFormModel) {
-				for (const field of props.config.fields) {
+				for (const field of (props.config.formItems || [])) {
 					if (typeof field.setValue === 'function') {
 						field.setValue(field, defaultFormModel[field.prop], defaultFormModel)
 					} else {
@@ -70,7 +80,7 @@ export default defineComponent({
 			onSubmit() {
 				state.formRef.validate((valid) => {
 					if (valid) {
-						props.config.operations?.onSubmit({...state.formModel})
+						context.emit('submit', {...state.formModel})
 					}
 				})
 			},
@@ -78,7 +88,11 @@ export default defineComponent({
 				state.setDefaultFormModel(state.defaultFormModel)
 				nextTick(() => {
 					state.formRef.resetFields()
+					context.emit('reset')
 				})
+			},
+			onCancel() {
+				context.emit('cancel')
 			}
 		}
 	}
@@ -104,7 +118,7 @@ export default defineComponent({
 <!--		const state = reactive({-->
 <!--			formConfig: {-->
 <!--				labelWidth: '120px',-->
-<!--				fields: [-->
+<!--				formItems: [-->
 <!--					{-->
 <!--						prop: 'username', value: '',-->
 <!--						label: '用户名', width: '100px',-->
@@ -130,7 +144,7 @@ export default defineComponent({
 <!--						attrs: { label: '记住' }-->
 <!--					}-->
 <!--				],-->
-<!--				operations: {-->
+<!--				operationsFormItem: {-->
 <!--				}-->
 <!--			},-->
 <!--		})-->

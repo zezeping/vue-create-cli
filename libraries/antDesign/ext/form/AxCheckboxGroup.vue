@@ -12,11 +12,11 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { ElCheckbox, ElCheckboxGroup } from 'element-plus'
+import { Checkbox, CheckboxGroup } from 'ant-design-vue'
 export default defineComponent({
 	components: {
-		ElCheckbox,
-		ElCheckboxGroup
+		[Checkbox.name]: Checkbox,
+		[CheckboxGroup.name]: CheckboxGroup,
 	},
 	props: {
 		labelKey: {
