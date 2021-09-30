@@ -3,13 +3,22 @@ import supportMetaCancelToken from './supportMetaCancelToken'
 // import store from '../store'
 
 // 创建 api 实例
-const apiAxios = axios.create({
+const apiAxios = new Proxy(axios.create({
   // https://cn.vitejs.dev/guide/env-and-mode.html
   baseURL: import.meta.env.VITE_APP_API_BASE_URL || '/',
   timeout: 1000 * 60
+}), {
+  get(target, ...args) {
+    return Reflect.get(target, ...args) || Reflect.get(axios, ...args)
+  }
 })
-apiAxios.CancelToken = axios.CancelToken
-apiAxios.isCancel = axios.isCancel
+//apiAxios.CancelToken = axios.CancelToken
+//apiAxios.isCancel = axios.isCancel
+//Object.keys(axios).forEach(key => {
+//  if (axios.hasOwnProperty(key) && !apiAxios.hasOwnProperty(key)) {
+//    apiAxios[key] = axios[key]
+//  }
+//})
 apiAxios.defaults.meta = {
   // 请求重试
   retry: 1/*times*/, retryDelay: 100/*ms*/, curRetry: 0/*times*/,

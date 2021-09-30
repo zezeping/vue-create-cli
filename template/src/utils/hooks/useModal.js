@@ -1,16 +1,7 @@
-import {
-  createApp,
-  getCurrentInstance,
-  onUnmounted,
-  h,
-  reactive,
-  defineComponent,
-  watch,
-  nextTick,
-  createVNode,
-} from 'vue'
+import { createApp, getCurrentInstance, onUnmounted, h, reactive, defineComponent, provide } from 'vue'
 import { Modal } from 'ant-design-vue'
-import New from '../../views/repositories/New'
+import store from '@/store'
+import router from '@/router'
 
 const createAntDesignModal = (options) => {
   const { slots, ...otherOptions } = options
@@ -19,53 +10,53 @@ const createAntDesignModal = (options) => {
   const div = document.createElement('div')
   document.body.appendChild(div)
   const ModalComponent = defineComponent({
-    props: {
-      afterClose: Function,
-    },
     emits: ['afterClose'],
     setup(props, ctx) {
       componentInstance = getCurrentInstance()
-      const modalOptions = reactive({
+      const state = reactive({
         visible: true,
         ...otherOptions,
-        'onUpdate:visible': value => {
-          if (typeof otherOptions['onUpdate:visible'] === 'function') {
-            otherOptions['onUpdate:visible']()
-          }
-          if (!value) {
-            modalOptions.visible = false
+        'onUpdate:visible'(value) {
+          state.visible = value
+          if (typeof options['onUpdate:visible'] === 'function') {
+            options['onUpdate:visible'](...arguments)
           }
         },
         afterClose() {
-          if (typeof otherOptions.onAfterClose === 'function') {
-            otherOptions.onAfterClose()
+          if (typeof state.onAfterClose === 'function') {
+            state.onAfterClose()
           }
-          props.afterClose()
+          ctx.emit('afterClose')
         }
       })
-      const modalSlots = reactive({...slots})
+      const slots = reactive(options.slots)
+      
+      provide('modalState', state)
+      provide('modalSlots', slots)
       
       onUnmounted(() => {
         div.parentNode?.removeChild(div)
       })
       
       return {
-        modalOptions,
-        modalSlots
+        modalState: state,
+        modalSlots: slots
       }
     },
     render() {
-      return h(Modal, this.modalOptions, this.modalSlots)
+      return h(Modal, this.modalState, this.modalSlots)
     }
   })
   appInstance = createApp(ModalComponent, {
-    afterClose() {
+    onAfterClose() {
       appInstance.unmount()
     }
   })
+  appInstance.use(store)
+  appInstance.use(router)
   appInstance.mount(div)
   appInstance.close = () => {
-    componentInstance.ctx.modalOptions.visible = false
+    componentInstance.ctx.modalState.visible = false
   }
   return appInstance
 }

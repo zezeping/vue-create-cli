@@ -1,29 +1,29 @@
 <template>
-	<a-form class="ax-form" :model="formModel" v-bind="{...$attrs, ...omitKeys(config, ['model', 'formItems'])}" ref="formRef">
+	<a-form class="ax-form" :model="formModel" v-bind="{...$attrs, ...formAttrs}" ref="formRef">
 		<slot>
-			<template v-for="(field, idx) in config.formItems" :key="idx">
-				<slot :name="`${field.name}FormItem`" v-bind="{ field }">
-					<a-form-item v-bind="omitKeys(field, ['type', 'attrs'])">
-						<slot :name="field.name" v-bind="{ field }">
-							<template v-if="'a-checkbox' === field.type">
-								<component is="a-checkbox" v-model:checked="field.value" v-bind="omitKeys(field.attrs, ['label'])">{{ field.attrs.label || field.value }}</component>
+			<template v-for="(formItem, idx) in config.formItems" :key="idx">
+				<slot :name="`${formItem.name}FormItem`" v-bind="{ formItemAttrs: formItemAttrs(formItem), formItem, formModel, onSubmit, onReset, onCancel }">
+					<a-form-item v-bind="formItemAttrs(formItem)" v-if="slotKeys.indexOf(`${formItem.name}FormItem`) === -1">
+						<slot :name="formItem.name" v-bind="{ formItem, formModel, onSubmit, onReset, onCancel }">
+							<template v-if="'a-checkbox' === formItem.type">
+								<component is="a-checkbox" v-model:checked="formItem.value" v-bind="formItem.attrs">{{ formItem.attrs.label || formItem.value }}</component>
 							</template>
 							<template v-else>
-								<component :is="field.type" v-model:value="field.value" v-bind="field.attrs"></component>
+								<component :is="formItem.type" v-model:value="formItem.value" v-bind="formItem.attrs"></component>
 							</template>
 						</slot>
 					</a-form-item>
 				</slot>
 			</template>
-			<slot name="operationsFormItem" v-bind="{ config, onSubmit, onReset, onCancel, formItemConfig: omitKeys(config.operationsFormItem, ['onSubmit', 'onReset', 'onCancel']) }">
-				<a-form-item class="operations-form-item" v-bind="config.operationsFormItem">
-					<slot name="operations" v-bind="{ config, onSubmit, onReset, onCancel }">
-						<a-button type="primary" @click="onSubmit" style="margin: 0 5px;">提交</a-button>
-						<a-button @click="onCancel" style="margin: 0 5px;">取消</a-button>
-						<a-button @click="onReset" style="margin: 0 5px;">重置</a-button>
-					</slot>
-				</a-form-item>
-			</slot>
+		</slot>
+		<slot name="operationsFormItem" v-bind="{ config, formModel, onSubmit, onReset, onCancel, submitLoading }">
+			<a-form-item class="operations-form-item" v-bind="config.operationsFormItem" v-if="slotKeys.indexOf(`operationsFormItem`) === -1">
+				<slot name="operations" v-bind="{ config, formModel, onSubmit, onReset, onCancel, submitLoading }">
+					<a-button type="primary" @click="onSubmit" style="margin: 0 5px;">提交</a-button>
+					<a-button @click="onCancel" style="margin: 0 5px;">取消</a-button>
+					<a-button @click="onReset" style="margin: 0 5px;">重置</a-button>
+				</slot>
+			</a-form-item>
 		</slot>
 	</a-form>
 </template>
@@ -32,6 +32,7 @@
 import { computed, reactive, toRefs, nextTick } from 'vue'
 import { Input, Select, Checkbox, Textarea } from 'ant-design-vue'
 import { useOmitKeys } from '@/utils/hooks/useObject'
+import { useLoading } from '@/utils/hooks/useLoading'
 import AxSelect from './AxSelect'
 import AxCheckboxGroup from './AxCheckboxGroup'
 export default {
@@ -45,7 +46,7 @@ export default {
 		AxCheckboxGroup,
 	},
 	props: {
-		// keys: formItems
+		// keys: model, formItems, operations
 		config: {
 			type: Object,
 			default: () => ({})
@@ -53,7 +54,12 @@ export default {
 	},
 	emits: ['submit', 'reset', 'cancel'],
 	setup(props, context) {
+		const omitKeys = useOmitKeys()
 		const state = reactive({
+			submitLoading: useLoading(),
+			slotKeys: computed(() => Object.keys(context.slots)),
+			formAttrs: computed(() => omitKeys.value(props.config, ['model', 'formItems'])),
+			formItemAttrs: computed(() => (formItem) => omitKeys.value(formItem, ['type', 'attrs', 'value'])),
 			formRef: null,
 			defaultFormModel: null,
 			validate: () => state.formRef.validate(),
@@ -62,29 +68,30 @@ export default {
 					return context.attrs.model
 				}
 				const form = props.config.model || {}
-				for (const field of (props.config.formItems || [])) {
-					form[field.name] = typeof field.getValue === 'function' ? field.getValue(field, form) : field.value
+				for (const formItem of (props.config.formItems || [])) {
+					form[formItem.name] = typeof formItem.getValue === 'function' ? formItem.getValue(formItem, form) : formItem.value
 				}
 				return {...state.defaultFormModel, ...form}
 			}),
 			setDefaultFormModel(defaultFormModel) {
-				for (const field of (props.config.formItems || [])) {
-					if (typeof field.setValue === 'function') {
-						field.setValue(field, defaultFormModel[field.name], defaultFormModel)
+				for (const formItem of (props.config.formItems || [])) {
+					if (typeof formItem.setValue === 'function') {
+						formItem.setValue(formItem, defaultFormModel[formItem.name], defaultFormModel)
 					} else {
-						field.value = defaultFormModel[field.name]
+						formItem.value = defaultFormModel[formItem.name]
 					}
 				}
 				state.defaultFormModel = defaultFormModel
 			}
 		})
 		state.setDefaultFormModel(state.formModel)
+
+		const onCancel = () => context.emit('cancel')
 		return {
 			...toRefs(state),
-			omitKeys: useOmitKeys(),
 			onSubmit() {
-				state.formRef.validate().then(() => {
-					context.emit('submit', {...state.formModel})
+				state.formRef.validate().then(async () => {
+					context.emit('submit', {...state.formModel}, { submitLoading: state.submitLoading, onCancel })
 				})
 			},
 			onReset() {
@@ -94,9 +101,7 @@ export default {
 					context.emit('reset')
 				})
 			},
-			onCancel() {
-				context.emit('cancel')
-			}
+			onCancel
 		}
 	}
 }
@@ -105,12 +110,12 @@ export default {
 <!--<template>-->
 <!--	<div class="home">-->
 <!--		<ax-form :config="formConfig" ref="formRef">-->
-<!--			&lt;!&ndash;			<template v-slot:usernameFormItem="{ field }">&ndash;&gt;-->
-<!--			&lt;!&ndash;				自定义FormItem{{ field }}&ndash;&gt;-->
-<!--			&lt;!&ndash;			</template>&ndash;&gt;-->
-<!--			&lt;!&ndash;			<template v-slot:username="{field}">&ndash;&gt;-->
-<!--			&lt;!&ndash;				自定义input: {{ field }}&ndash;&gt;-->
-<!--			&lt;!&ndash;			</template>&ndash;&gt;-->
+<!--&lt;!&ndash;						<template v-slot:usernameFormItem="{ formItem }">&ndash;&gt;-->
+<!--&lt;!&ndash;							自定义FormItem{{ formItem }}&ndash;&gt;-->
+<!--&lt;!&ndash;						</template>&ndash;&gt;-->
+<!--&lt;!&ndash;						<template v-slot:username="{field}">&ndash;&gt;-->
+<!--&lt;!&ndash;							自定义input: {{ field }}&ndash;&gt;-->
+<!--&lt;!&ndash;						</template>&ndash;&gt;-->
 <!--		</ax-form>-->
 <!--	</div>-->
 <!--</template>-->
