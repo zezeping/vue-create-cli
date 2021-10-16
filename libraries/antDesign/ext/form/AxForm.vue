@@ -6,7 +6,7 @@
 					<a-form-item v-bind="formItemAttrs(formItem)" v-if="slotKeys.indexOf(`${formItem.name}FormItem`) === -1">
 						<slot :name="formItem.name" v-bind="{ formItem, formModel, onSubmit, onReset, onCancel }">
 							<template v-if="'a-checkbox' === formItem.type">
-								<component is="a-checkbox" v-model:checked="formItem.value" v-bind="formItem.attrs">{{ formItem.attrs.label || formItem.value }}</component>
+                <a-checkbox v-model:checked="formItem.value" v-bind="formItem.attrs">{{ formItem.attrs.label || formItem.value }}</a-checkbox>
 							</template>
 							<template v-else>
 								<component :is="formItem.type" v-model:value="formItem.value" v-bind="formItem.attrs"></component>

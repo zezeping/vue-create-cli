@@ -5,6 +5,21 @@ module.exports = {
     return inquirer.prompt([
       {
         type: 'checkbox',
+        message: '可快速集成的代码工具集',
+        name: 'tools',
+        choices: [
+          new inquirer.Separator('支持的工具集'), // 分割线
+          { name: 'eslint', checked: true, },
+          //{ name: 'jest', checked: false, },
+        ],
+        validate (answer) {
+          //if (answer.length < 1) {
+          //  return 'You must choose at least one topping.'
+          //}
+          return true
+        },
+      }, {
+        type: 'checkbox',
         message: '可快速集成的ui库',
         name: 'uis',
         choices: [
@@ -32,8 +47,8 @@ module.exports = {
         },
       },
     ]).then((answers) => {
-      const { uis, others } = answers
-      return [...uis, ...others]
+      const { tools, uis, others } = answers
+      return [...tools, ...uis, ...others]
     })
   }
 }

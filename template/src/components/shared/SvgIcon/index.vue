@@ -1,5 +1,5 @@
 <template>
-  <component class="svg-icon" :class="{'inherit-color': inheritColor}" :is="componentName" viewbox="0 0 130 130">
+  <component :is="componentName" class="svg-icon" :class="{'inherit-color': inheritColor}" viewbox="0 0 130 130">
     <slot></slot>
   </component>
 </template>
@@ -13,6 +13,14 @@ const modules = import.meta.globEager('./svg/*.svg')
 import {computed} from 'vue'
 export default defineComponent({
   name: 'SvgIcon',
+  // https://vitejs.dev/guide/features.html#glob-import
+  components: {
+    ...Object.assign({}, ...Object.keys(modules).map(key => {
+      const iconName = key.match(/([\w|-]+).svg$/i)[1]
+      const componentName = `${iconName}-icon`
+      return { [componentName]: modules[key].default }
+    }))
+  },
   props: {
     name: {
       type: String,
@@ -27,14 +35,6 @@ export default defineComponent({
     return {
       componentName: computed(() => `${props.name}-icon`)
     }
-  },
-  // https://vitejs.dev/guide/features.html#glob-import
-  components: {
-    ...Object.assign({}, ...Object.keys(modules).map(key => {
-      const iconName = key.match(/([\w|-]+).svg$/i)[1]
-      const componentName = `${iconName}-icon`
-      return { [componentName]: modules[key].default }
-    }))
   }
 })
 </script>

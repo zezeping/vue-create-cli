@@ -48,7 +48,20 @@ module.exports = async function (projectName, options, command) {
   })
   // ui库
   await inquirerStatements.addUiLibraries().then(selectedAnswers => {
-    //console.error(selectedAnswers)
+    console.error(selectedAnswers)
+    if (selectedAnswers.indexOf('eslint') !== -1) {
+      logger.info(`添加eslint相关库`)
+      logger.info(`npm i eslint@7 eslint-plugin-vue vite-plugin-eslint -D --registry ${registry}`)
+      spawnSync(`npm i eslint@7 eslint-plugin-vue vite-plugin-eslint -D --registry ${registry}`, [], {
+        shell: true,
+        stdio: 'inherit',
+        cwd: projectPath
+      })
+      fs.copySync(path.join(librariesPath, 'eslint/.eslintrc.js'), path.join(projectPath, '.eslintrc.js'))
+      fs.copySync(path.join(librariesPath, 'eslint/.eslintignore'), path.join(projectPath, '.eslintignore'))
+      const viteConfig = fs.readFileSync(path.join(projectPath, 'vite.config.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'vite.config.js'), viteConfig.replace(`// import eslintPlugin from 'vite-plugin-eslint'`, `import eslintPlugin from 'vite-plugin-eslint'`).replace(`// eslintPlugin(),`, `eslintPlugin(),`))
+    }
     if (selectedAnswers.indexOf('ElementPlus') !== -1) {
       logger.info(`添加ElementPlus相关库`)
       logger.info(`npm i element-plus -S --registry ${registry}`)
