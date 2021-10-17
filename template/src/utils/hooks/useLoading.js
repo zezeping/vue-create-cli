@@ -11,8 +11,6 @@ export function useLoading() {
         } else if (typeof executor === 'function') {
           await executor()
         }
-      } catch (e) {
-        throw e
       } finally {
         loading.value = false
       }

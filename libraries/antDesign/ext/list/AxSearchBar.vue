@@ -1,63 +1,61 @@
 <template>
-	<a-form class="ax-search-bar" ref="formRef" :model="form" @submit="submit" v-bind="omitKeys(config, ['queryList'])" v-if="queryList && queryList.length">
-		<template v-for="(query, idx) in queryList" :key="idx">
-			<slot :name="query.slot || `${query.key}Query`" :query="query">
-				<a-form-item :name="query.key" :label="query.label" :rules="query.rules">
-					<a-input v-model="query.value" v-bind="query.attrs" v-if="query.type === 'input'"></a-input>
-					<ax-select v-model="query.value" v-bind="query.attrs" v-else-if="query.type === 'select'">
-						<template v-slot:default="{ options, labelKey, valueKey }">
-							<template v-for="(option, idx) in options" :key="idx">
-								<a-select-option :value="option[valueKey]">{{ option[labelKey] }}</a-select-option>
-							</template>
-						</template>
-					</ax-select>
-				</a-form-item>
-			</slot>
-		</template>
-		<a-form-item>
-			<slot name="operations" :submit="submit" :reset="reset">
-				<el-button type="primary" @click="submit">搜索</el-button>
-				<el-button @click="reset">重置</el-button>
-			</slot>
-		</a-form-item>
-	</a-form>
+  <ax-form v-if="formItems && formItems.length" ref="formRef" class="ax-search-bar" :config="config" v-bind="omitKeys(config, ['formItems'])" @submit="submit">
+    <template v-for="(slotKey, idx) in slotKeys" :key="idx" #[computedAxFormSlotKey(slotKey)]="slotProps">
+      <slot :name="slotKey" v-bind="slotProps"></slot>
+    </template>
+    <template #operationsFormItem="{ onSubmit, onReset }">
+      <slot name="operationsFormItemQuery">
+        <a-form-item v-bind="config.operationsFormItem">
+          <slot name="operationsQuery" v-bind="{ onSubmit, onReset }">
+            <a-button type="primary" @click="onSubmit">搜索</a-button>
+            <a-button style="margin-left: 15px;" @click="onReset">重置</a-button>
+          </slot>
+        </a-form-item>
+      </slot>
+    </template>
+  </ax-form>
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
 import { useOmitKeys } from '@/utils/hooks/useObject'
-import AxSelect from '../form/AxSelect'
+import AxForm from '../form/AxForm'
 export default defineComponent({
-	components: {
-		AxSelect
-	},
-	props: {
-		config: Object,
-		queryList: Array,
-		getTableQuery: Function
-	},
-	emits: ['search', 'reset'],
-	setup() {
-		return {
-			omitKeys: useOmitKeys()
-		}
-	},
- 	computed: {
-		form() {
-			return this.getTableQuery()
-		}
-	},
-	methods: {
-		submit() {
-			this.$refs['formRef'].validate().then(() => {
-				this.$emit('search', this.form)
-			}).catch(e => {
-				console.log(e)
-			})
-		},
-		reset() {
-			this.$emit('reset', this.$refs['formRef'])
-		}
-	}
+  components: {
+    AxForm
+  },
+  props: {
+    config: Object,
+    formItems: Array,
+    searchQuery: Object,
+  },
+  emits: ['search', 'reset'],
+  setup(props, ctx) {
+    const state = reactive({
+      omitKeys: useOmitKeys(),
+      formRef: null,
+      computedAxFormSlotKey: computed(() => (slotKey) => slotKey.replace(/Query$/, '')),
+      slotKeys: computed(() => Object.keys(ctx.slots).filter(key => key !== 'operationsQuery')),
+    })
+    return {
+      ...toRefs(state)
+    }
+  },
+  mounted () {
+    this.$refs.formRef.setDefaultFormModel(this.searchQuery || {})
+  },
+  methods: {
+    submit(formData) {
+      this.$emit('search', formData)
+    }
+  }
 })
 </script>
+
+<style lang="scss" scoped>
+.ax-search-bar {
+  ::v-deep(.ant-form-item) {
+    margin-bottom: 15px;
+  }
+}
+</style>

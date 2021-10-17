@@ -60,7 +60,7 @@ module.exports = async function (projectName, options, command) {
       fs.copySync(path.join(librariesPath, 'eslint/.eslintrc.js'), path.join(projectPath, '.eslintrc.js'))
       fs.copySync(path.join(librariesPath, 'eslint/.eslintignore'), path.join(projectPath, '.eslintignore'))
       const viteConfig = fs.readFileSync(path.join(projectPath, 'vite.config.js'), 'utf-8')
-      fs.writeFileSync(path.join(projectPath, 'vite.config.js'), viteConfig.replace(`// import eslintPlugin from 'vite-plugin-eslint'`, `import eslintPlugin from 'vite-plugin-eslint'`).replace(`// eslintPlugin(),`, `eslintPlugin(),`))
+      fs.writeFileSync(path.join(projectPath, 'vite.config.js'), viteConfig.replace(`// import eslintPlugin from 'vite-plugin-eslint'`, `import eslintPlugin from 'vite-plugin-eslint'`).replace(`// eslintPlugin({ cache: false }),`, `eslintPlugin({ cache: false }),`))
     }
     if (selectedAnswers.indexOf('ElementPlus') !== -1) {
       logger.info(`添加ElementPlus相关库`)
@@ -72,6 +72,8 @@ module.exports = async function (projectName, options, command) {
       })
       fs.ensureDirSync(path.join(projectPath, 'src/components/shared/elementPlus'))
       fs.copySync(path.join(librariesPath, 'elementPlus'), path.join(projectPath, 'src/components/shared/elementPlus'))
+      const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import elementPlus from './elementPlus'`, `import elementPlus from './elementPlus'`).replace(`// app.use(elementPlus)`, `app.use(elementPlus)`))
     }
     if (selectedAnswers.indexOf('AntDesignVue') !== -1) {
       logger.info(`添加AntDesignVue相关库`)
@@ -83,6 +85,8 @@ module.exports = async function (projectName, options, command) {
       })
       fs.ensureDirSync(path.join(projectPath, 'src/components/shared/antDesign'))
       fs.copySync(path.join(librariesPath, 'antDesign'), path.join(projectPath, 'src/components/shared/antDesign'))
+      const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import antDesign from './antDesign'`, `import antDesign from './antDesign'`).replace(`// app.use(antDesign)`, `app.use(antDesign)`))
     }
     if (selectedAnswers.indexOf('Echarts') !== -1) {
       logger.info(`添加Echarts相关库`)
@@ -94,6 +98,8 @@ module.exports = async function (projectName, options, command) {
       })
       fs.ensureDirSync(path.join(projectPath, 'src/components/shared/Echarts'))
       fs.copySync(path.join(librariesPath, 'Echarts'), path.join(projectPath, 'src/components/shared/Echarts'))
+      const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import Echarts from './Echarts'`, `import Echarts from './Echarts'`).replace(`// app.use(Echarts)`, `app.use(Echarts)`))
     }
   })
 }

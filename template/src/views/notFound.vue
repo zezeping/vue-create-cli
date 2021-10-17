@@ -1,4 +1,4 @@
 <template>
-	Not Found
-	<div>{{ $route }}</div>
+  Not Found
+  <div>{{ $route }}</div>
 </template>

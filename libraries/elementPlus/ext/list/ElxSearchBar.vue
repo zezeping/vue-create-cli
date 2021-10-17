@@ -1,68 +1,53 @@
 <template>
-	<el-form class="elx-search-bar" ref="formRef" :model="form" @submit="submit" v-bind="omitKeys(config, ['queryList'])" v-if="queryList && queryList.length">
-		<template v-for="(query, idx) in queryList" :key="idx">
-			<slot :name="query.slot || `${query.key}Query`" :query="query">
-				<el-form-item :prop="query.key" :label="query.label" :rules="query.rules">
-					<el-input v-model="query.value" v-bind="query.attrs" v-if="query.type === 'input'"></el-input>
-					<elx-select v-model="query.value" v-bind="query.attrs" v-else-if="query.type === 'select'">
-						<template v-slot:default="{ options, labelKey, valueKey }">
-							<template v-for="(option, idx) in options" :key="idx">
-								<el-option :value="option[valueKey]" :label="option[labelKey]"></el-option>
-							</template>
-						</template>
-					</elx-select>
-				</el-form-item>
-			</slot>
-		</template>
-		<el-form-item>
-			<slot name="operations" :submit="submit" :reset="reset">
-				<el-button type="primary" @click="submit">搜索</el-button>
-				<el-button @click="reset">重置</el-button>
-			</slot>
-		</el-form-item>
-	</el-form>
+  <elx-form v-if="formItems && formItems.length" ref="formRef" class="elx-search-bar" :config="config" v-bind="omitKeys(config, ['formItems'])" @submit="submit">
+    <template v-for="(slotKey, idx) in slotKeys" :key="idx" #[computedAxFormSlotKey(slotKey)]="slotProps">
+      <slot :name="slotKey" v-bind="slotProps"></slot>
+    </template>
+    <template #operationsFormItem="{ onSubmit, onReset }">
+      <slot name="operationsFormItemQuery">
+        <el-form-item v-bind="config.operationsFormItem">
+          <slot name="operationsQuery" v-bind="{ onSubmit, onReset }">
+            <el-button type="primary" @click="onSubmit">搜索</el-button>
+            <el-button @click="onReset">重置</el-button>
+          </slot>
+        </el-form-item>
+      </slot>
+    </template>
+  </elx-form>
 </template>
 
 <script>
-import { defineComponent } from 'vue'
-import { ElForm, ElFormItem, ElInput, ElSelect } from 'element-plus'
+import { computed, defineComponent, reactive, toRefs } from 'vue'
+import ElxForm from '../form/ElxForm'
 import { useOmitKeys } from '@/utils/hooks/useObject'
-import ElxSelect from '../form/ElxSelect'
 export default defineComponent({
-	components: {
-		[ElForm.name]: ElForm,
-		[ElFormItem.name]: ElFormItem,
-		[ElInput.name]: ElInput,
-		[ElSelect.name]: ElSelect,
-		ElxSelect
-	},
-	props: {
-		config: Object,
-		queryList: Array,
-		getTableQuery: Function
-	},
-	emits: ['search', 'reset'],
-	setup() {
-		return {
-			omitKeys: useOmitKeys()
-		}
-	},
-	computed: {
-		form() {
-			return this.getTableQuery()
-		}
-	},
-	methods: {
-		submit() {
-			this.$refs['formRef'].validate((valid) => {
-				if (valid) {
-					this.$emit('search', this.form)
-				}
-			})
-		},
-		reset() {
-			this.$emit('reset', this.$refs['formRef'])
-		}
-	}
+  components: {
+    ElxForm,
+  },
+  props: {
+    config: Object,
+    formItems: Array,
+    searchQuery: Object,
+  },
+  emits: ['search'],
+  setup(props, ctx) {
+    const state = reactive({
+      omitKeys: useOmitKeys(),
+      formRef: null,
+      computedAxFormSlotKey: computed(() => (slotKey) => slotKey.replace(/Query$/, '')),
+      slotKeys: computed(() => Object.keys(ctx.slots).filter(key => key !== 'operationsQuery')),
+    })
+    return {
+      ...toRefs(state)
+    }
+  },
+  mounted () {
+    this.$refs.formRef.setDefaultFormModel(this.searchQuery || {})
+  },
+  methods: {
+    submit(formData) {
+      this.$emit('search', formData)
+    }
+  }
 })
 </script>

@@ -17,12 +17,12 @@ app.use(ContextMenu)
 <!--    <context-menu-item>b</context-menu-item>-->
 <!--    <context-menu-item sub-menu>-->
 <!--      <span>c</span>-->
-<!--      <template v-slot:sub-menu>-->
+<!--      <template #sub-menu>-->
 <!--        <context-menu-item>c1</context-menu-item>-->
 <!--        <context-menu-item>c2</context-menu-item>-->
 <!--        <context-menu-item>-->
 <!--          <span>c3</span>-->
-<!--          <template v-slot:sub-menu>-->
+<!--          <template #sub-menu>-->
 <!--            <context-menu-item>c31</context-menu-item>-->
 <!--            <context-menu-item>c32</context-menu-item>-->
 <!--            <context-menu-item>c33</context-menu-item>-->

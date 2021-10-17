@@ -57,7 +57,7 @@ export default defineConfig(params => {
     plugins: [
       vue(),
       vueJsx(),
-      // eslintPlugin(),
+      // eslintPlugin({ cache: false }),
       Components({
         resolvers: [
           AntDesignVueResolver({ importStyle: false }),

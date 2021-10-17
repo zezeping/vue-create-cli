@@ -26,7 +26,7 @@ module.exports = {
     'no-console': 'off',
     'quotes': ['error', 'single'], // 单引号
     'semi': ['warn', 'never'], // 禁止分号
-    // 'indent': ['warn', 2], // 缩进对齐, 2个空格
+    'indent': ['warn', 2], // 缩进对齐, 2个空格
     'no-unused-vars': [
       'error', {
         'vars': 'all',
@@ -39,6 +39,7 @@ module.exports = {
     'vue/html-self-closing': 'off',
     'vue/html-indent': 'off',
     'vue/require-default-prop': 'off',
+    'vue/attribute-hyphenation': 'off',
     'vue/singleline-html-element-content-newline': 'off',
     'vue/max-attributes-per-line': [
       'warn', {

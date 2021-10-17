@@ -55,7 +55,7 @@ export default defineComponent({
             switch (state.onFixedVerticalDirection) {
               case 'top':
                 // translateY = -topShrink
-                  top = top - topShrink
+                top = top - topShrink
                 break
               case 'bottom':
                 // translateY = topShrink
