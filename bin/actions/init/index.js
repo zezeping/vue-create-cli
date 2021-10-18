@@ -5,7 +5,7 @@ const fs = require('fs-extra')
 const logger = require('../../utils/logger')
 const inquirerStatements = require('../../utils/inquirerStatements')
 
-module.exports = async function (projectName, options, command) {
+module.exports = async (projectName, options, command) => {
   const { registry } = options
   console.log(projectName, options)
   
@@ -49,6 +49,7 @@ module.exports = async function (projectName, options, command) {
   // ui库
   await inquirerStatements.addUiLibraries().then(selectedAnswers => {
     console.error(selectedAnswers)
+    // eslint
     if (selectedAnswers.indexOf('eslint') !== -1) {
       logger.info(`添加eslint相关库`)
       logger.info(`npm i eslint@7 eslint-plugin-vue vite-plugin-eslint -D --registry ${registry}`)
@@ -62,6 +63,23 @@ module.exports = async function (projectName, options, command) {
       const viteConfig = fs.readFileSync(path.join(projectPath, 'vite.config.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'vite.config.js'), viteConfig.replace(`// import eslintPlugin from 'vite-plugin-eslint'`, `import eslintPlugin from 'vite-plugin-eslint'`).replace(`// eslintPlugin({ cache: false }),`, `eslintPlugin({ cache: false }),`))
     }
+    // vue-i18n
+    if (selectedAnswers.indexOf('vue-i18n') !== -1) {
+      logger.info(`添加vue-i18n相关库`)
+      logger.info(`npm i vue-i18n@next -D --registry ${registry}`)
+      spawnSync(`npm i vue-i18n@next -D --registry ${registry}`, [], {
+        shell: true,
+        stdio: 'inherit',
+        cwd: projectPath
+      })
+      fs.copySync(path.join(librariesPath, 'i18n'), path.join(projectPath, 'src/i18n'))
+      const i18nConfig = fs.readFileSync(path.join(projectPath, 'src/main.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'src/main.js'), i18nConfig.replace(`// import i18n from './i18n'`, `import i18n from './i18n'`).replace(`// app.use(i18n)`, `app.use(i18n)`))
+    } else {
+      const i18nConfig = fs.readFileSync(path.join(projectPath, 'src/main.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'src/main.js'), i18nConfig.replace(`// import i18n from './i18n'\n`, ``).replace(`// app.use(i18n)\n`, ``))
+    }
+    // ElementPlus
     if (selectedAnswers.indexOf('ElementPlus') !== -1) {
       logger.info(`添加ElementPlus相关库`)
       logger.info(`npm i element-plus -S --registry ${registry}`)
@@ -74,7 +92,11 @@ module.exports = async function (projectName, options, command) {
       fs.copySync(path.join(librariesPath, 'elementPlus'), path.join(projectPath, 'src/components/shared/elementPlus'))
       const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import elementPlus from './elementPlus'`, `import elementPlus from './elementPlus'`).replace(`// app.use(elementPlus)`, `app.use(elementPlus)`))
+    } else {
+      const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import elementPlus from './elementPlus'\n`, ``).replace(`// app.use(elementPlus)\n`, ``))
     }
+    // AntDesignVue
     if (selectedAnswers.indexOf('AntDesignVue') !== -1) {
       logger.info(`添加AntDesignVue相关库`)
       logger.info(`npm i ant-design-vue@next -S --registry ${registry}`)
@@ -87,7 +109,11 @@ module.exports = async function (projectName, options, command) {
       fs.copySync(path.join(librariesPath, 'antDesign'), path.join(projectPath, 'src/components/shared/antDesign'))
       const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import antDesign from './antDesign'`, `import antDesign from './antDesign'`).replace(`// app.use(antDesign)`, `app.use(antDesign)`))
+    } else {
+      const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import antDesign from './antDesign'\n`, ``).replace(`// app.use(antDesign)\n`, ``))
     }
+    // Echarts
     if (selectedAnswers.indexOf('Echarts') !== -1) {
       logger.info(`添加Echarts相关库`)
       logger.info(`npm i echarts -S --registry ${registry}`)
@@ -100,6 +126,9 @@ module.exports = async function (projectName, options, command) {
       fs.copySync(path.join(librariesPath, 'Echarts'), path.join(projectPath, 'src/components/shared/Echarts'))
       const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import Echarts from './Echarts'`, `import Echarts from './Echarts'`).replace(`// app.use(Echarts)`, `app.use(Echarts)`))
+    } else {
+      const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import Echarts from './Echarts'\n`, ``).replace(`// app.use(Echarts)\n`, ``))
     }
   })
 }

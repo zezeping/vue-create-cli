@@ -10,6 +10,7 @@ module.exports = {
         choices: [
           new inquirer.Separator('支持的工具集'), // 分割线
           { name: 'eslint', checked: true, },
+          { name: 'vue-i18n', checked: false, },
           //{ name: 'jest', checked: false, },
         ],
         validate (answer) {
