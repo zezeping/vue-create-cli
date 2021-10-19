@@ -1,6 +1,6 @@
 <template>
   <teleport to="body">
-    <div class="context-menu" v-show="menuSwitch" :style="contextMenuStyle" ref="contextMenuRef">
+    <div v-show="menuSwitch" ref="contextMenuRef" class="context-menu" :style="contextMenuStyle">
       <slot></slot>
     </div>
   </teleport>
@@ -11,7 +11,7 @@ import {defineComponent, ref, onMounted, onBeforeUnmount} from 'vue'
 
 export default defineComponent({
   name: 'ContextMenu',
-  setup(props, context) {
+  setup(_props, _ctx) {
     const menuSwitch = ref(false)
     const contextMenuRef = ref(null)
     const contextMenuStyle = ref({})

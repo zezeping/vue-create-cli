@@ -1,8 +1,7 @@
 <template>
-  <div @mouseover="onMouseOver" @mouseleave="onMouseLeave" @click.stop="onClick" class="context-menu-item"
-       :class="{'sub-menu': existsSubMenu}" ref="contextMenuItemRef">
+  <div ref="contextMenuItemRef" class="context-menu-item" :class="{'sub-menu': existsSubMenu}" @mouseover="onMouseOver" @mouseleave="onMouseLeave" @click.stop="onClick">
     <slot></slot>
-    <div class="context-sub-menu" v-show="subMenuSwitch" :style="{ left: `${elWidth}px`, top: 0 }">
+    <div v-show="subMenuSwitch" class="context-sub-menu" :style="{ left: `${elWidth}px`, top: 0 }">
       <slot name="sub-menu"></slot>
     </div>
   </div>
@@ -80,7 +79,7 @@ export default defineComponent({
     justify-content: space-between;
     align-items: center;
 
-    &:after {
+    &::after {
       content: '';
       width: 5px;
       height: 5px;
@@ -91,7 +90,7 @@ export default defineComponent({
       right: 5px;
       top: 50%;
       transform: translateY(-50%) rotate(-45deg);
-      opacity: .6;
+      opacity: 0.6;
     }
 
     .context-sub-menu {

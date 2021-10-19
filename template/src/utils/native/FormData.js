@@ -32,7 +32,7 @@ if (!FormData.fromJson) {
 }
 // toJson
 function generateItem (obj, key, value) {
-  if (obj.hasOwnProperty(key)) {
+  if (Object.prototype.hasOwnProperty.call(obj, key)) {
     if ((obj[key] instanceof Array)) {
       obj[key].push(value)
     } else {
@@ -47,7 +47,7 @@ function handleNestKeyValue (obj, key, value) {
   let pObj = obj
   for (let i = 0; i < splitKeys.length - 1; i ++) {
     let key = splitKeys[i]
-    if (pObj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(pObj, key)) {
       if (pObj[key] instanceof Array) {
         let objs = pObj[key].filter(item => item instanceof Object && !(item instanceof File || item instanceof Blob))
         // 不存在对象吗，则创建对象

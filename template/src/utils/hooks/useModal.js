@@ -4,11 +4,13 @@ import store from '@/store'
 import router from '@/router'
 
 const createAntDesignModal = (options) => {
+  // eslint-disable-next-line no-unused-vars
   const { slots, ...otherOptions } = options
   let appInstance = null
   let componentInstance = null
   const div = document.createElement('div')
   document.body.appendChild(div)
+  // eslint-disable-next-line vue/one-component-per-file
   const ModalComponent = defineComponent({
     emits: ['afterClose'],
     setup(props, ctx) {
@@ -47,6 +49,7 @@ const createAntDesignModal = (options) => {
       return h(Modal, this.modalState, this.modalSlots)
     }
   })
+  // eslint-disable-next-line vue/one-component-per-file
   appInstance = createApp(ModalComponent, {
     onAfterClose() {
       appInstance.unmount()

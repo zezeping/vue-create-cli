@@ -60,8 +60,65 @@ module.exports = async (projectName, options, command) => {
       })
       fs.copySync(path.join(librariesPath, 'eslint/.eslintrc.js'), path.join(projectPath, '.eslintrc.js'))
       fs.copySync(path.join(librariesPath, 'eslint/.eslintignore'), path.join(projectPath, '.eslintignore'))
+      // vite.config.js
       const viteConfig = fs.readFileSync(path.join(projectPath, 'vite.config.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'vite.config.js'), viteConfig.replace(`// import eslintPlugin from 'vite-plugin-eslint'`, `import eslintPlugin from 'vite-plugin-eslint'`).replace(`// eslintPlugin({ cache: false }),`, `eslintPlugin({ cache: false }),`))
+      // package.json
+      let packageJson = fs.readJsonSync(path.resolve(projectPath, 'package.json'))
+      packageJson.scripts = { ...packageJson.scripts, 'lint:eslint': 'eslint --ext .js,.vue src' }
+      fs.writeJsonSync(path.resolve(projectPath, 'package.json'), packageJson, {spaces: 2})
+    }
+    // stylelint
+    if (selectedAnswers.indexOf('stylelint') !== -1) {
+      logger.info(`添加stylelint相关库`)
+      logger.info(`npm i stylelint stylelint-config-standard -D --registry ${registry}`)
+      spawnSync(`npm i stylelint stylelint-config-standard -D --registry ${registry}`, [], {
+        shell: true,
+        stdio: 'inherit',
+        cwd: projectPath
+      })
+      fs.copySync(path.join(librariesPath, 'stylelint/.stylelintrc.js'), path.join(projectPath, '.stylelintrc.js'))
+      fs.copySync(path.join(librariesPath, 'stylelint/.stylelintignore'), path.join(projectPath, '.stylelintignore'))
+      // package.json
+      let packageJson = fs.readJsonSync(path.resolve(projectPath, 'package.json'))
+      packageJson.scripts = { ...packageJson.scripts, 'lint:stylelint': 'stylelint src/**/*.{css,scss,less,vue}' }
+      fs.writeJsonSync(path.resolve(projectPath, 'package.json'), packageJson, {spaces: 2})
+    }
+    // git-hooks
+    if (selectedAnswers.indexOf('git-hooks') !== -1) {
+      logger.info(`添加git-hooks相关库`)
+      // package.json
+      const packageJson = fs.readJsonSync(path.resolve(projectPath, 'package.json'))
+      packageJson.scripts = {
+        ...packageJson.scripts,
+        'lint-staged': 'lint-staged',
+        //prepare 是 NPM 操作生命周期中的一环，在执行 install 的时候会按生命周期顺序执行相应钩子：NPM7：preinstall -> install -> postinstall -> prepublish -> preprepare -> prepare -> postprepare
+        'prepare': 'husky install && husky add .husky/pre-commit "npm run lint-staged"',
+      }
+      packageJson['lint-staged'] = packageJson['lint-staged'] || {}
+      if (selectedAnswers.indexOf('eslint') !== -1) {
+        packageJson['lint-staged'] = {
+          ...packageJson['lint-staged'],
+          'src/**/*.{js,vue}': [
+            'npm run lint:eslint'
+          ],
+        }
+      }
+      if (selectedAnswers.indexOf('stylelint') !== -1) {
+        packageJson['lint-staged'] = {
+          ...packageJson['lint-staged'],
+          'src/**/*.{css,scss,less,vue}': [
+            'npm run lint:stylelint'
+          ],
+        }
+      }
+      fs.writeJsonSync(path.resolve(projectPath, 'package.json'), packageJson, {spaces: 2})
+      logger.info(`npm i husky lint-staged -D --registry ${registry}`)
+      spawnSync(`npm i husky lint-staged -D --registry ${registry}`, [], {
+        shell: true,
+        stdio: 'inherit',
+        cwd: projectPath
+      })
     }
     // vue-i18n
     if (selectedAnswers.indexOf('vue-i18n') !== -1) {
@@ -92,6 +149,8 @@ module.exports = async (projectName, options, command) => {
       fs.copySync(path.join(librariesPath, 'elementPlus'), path.join(projectPath, 'src/components/shared/elementPlus'))
       const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import elementPlus from './elementPlus'`, `import elementPlus from './elementPlus'`).replace(`// app.use(elementPlus)`, `app.use(elementPlus)`))
+      const viteConfig = fs.readFileSync(path.join(projectPath, 'vite.config.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'vite.config.js'), viteConfig.replace(`// ElementPlusResolver,`, `ElementPlusResolver,`).replace(`// ElementPlusResolver({ importStyle: false }),`, `ElementPlusResolver({ importStyle: false }),`))
     } else {
       const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import elementPlus from './elementPlus'\n`, ``).replace(`// app.use(elementPlus)\n`, ``))
@@ -109,6 +168,8 @@ module.exports = async (projectName, options, command) => {
       fs.copySync(path.join(librariesPath, 'antDesign'), path.join(projectPath, 'src/components/shared/antDesign'))
       const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import antDesign from './antDesign'`, `import antDesign from './antDesign'`).replace(`// app.use(antDesign)`, `app.use(antDesign)`))
+      const viteConfig = fs.readFileSync(path.join(projectPath, 'vite.config.js'), 'utf-8')
+      fs.writeFileSync(path.join(projectPath, 'vite.config.js'), viteConfig.replace(`// AntDesignVueResolver,`, `AntDesignVueResolver,`).replace(`// AntDesignVueResolver({ importStyle: false }),`, `AntDesignVueResolver({ importStyle: false }),`))
     } else {
       const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import antDesign from './antDesign'\n`, ``).replace(`// app.use(antDesign)\n`, ``))
@@ -131,4 +192,12 @@ module.exports = async (projectName, options, command) => {
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import Echarts from './Echarts'\n`, ``).replace(`// app.use(Echarts)\n`, ``))
     }
   })
+  
+  try {
+    spawnSync(`git init`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+    spawnSync(`npm i --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+    logger.info(`运行项目：\n cd ${ projectName }\n npm run dev`)
+  } catch (e) {
+    logger.info(`运行项目：\n cd ${ projectName }\n npm install\n npm run dev`)
+  }
 }

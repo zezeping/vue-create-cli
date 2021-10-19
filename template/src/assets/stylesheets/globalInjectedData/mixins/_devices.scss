@@ -21,7 +21,7 @@ $breakpoints: (
   @if not $query {
     @error 'No value found for `#{$breakpoint}`. Please make sure it is defined in `$breakpoints` map.';
   }
-
+  // stylelint-disable-next-line
   @media #{if(type-of($query) == 'string', unquote($query), inspect($query))} {
     @content;
   }
@@ -39,7 +39,6 @@ $breakpoints: (
 //    color: tomato;
 //  }
 //}
-
 
 // ==============================================================
 //@mixin mobile-device {

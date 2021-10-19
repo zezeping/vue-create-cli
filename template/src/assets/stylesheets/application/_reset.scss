@@ -1,7 +1,9 @@
 html {
-  height: 100%; box-sizing: border-box; background: map_get($theme, page-bgColor);
+  height: 100%;
+  box-sizing: border-box;
+  background: map_get($theme, 'page-bgColor');
 
-  *, *:before, *:after {
+  *, *::before, *::after {
     box-sizing: inherit;
   }
 }

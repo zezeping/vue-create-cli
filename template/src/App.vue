@@ -1,6 +1,6 @@
 <template>
   <img alt="Vue logo" src="@/assets/logo.png" />
-  <svg-icon name="help" style="color: red; width: 100px; height: 100px"></svg-icon>
+  <svg-icon name="help" style="color: red; width: 100px; height: 100px;"></svg-icon>
   <HelloWorld msg="Hello Vue 3 + Vite" />
   <hr />
   <table class="table border text-overflow-ellipsis" style="width: 200px; margin: 0 auto;">

@@ -1,3 +1,3 @@
 export function getRect(el) {
-	return el.getBoundingClientRect()
+  return el.getBoundingClientRect()
 }

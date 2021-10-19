@@ -1,5 +1,5 @@
 <template>
-  <div class="ext-sticky" ref="rootRef" :style="rootStyle">
+  <div ref="rootRef" class="ext-sticky" :style="rootStyle">
     <slot></slot>
   </div>
 </template>
@@ -53,26 +53,26 @@ export default defineComponent({
           // let translateY = 0
           if (state.verticalFixed) {
             switch (state.onFixedVerticalDirection) {
-              case 'top':
-                // translateY = -topShrink
-                top = top - topShrink
-                break
-              case 'bottom':
-                // translateY = topShrink
-                top = top + topShrink
-                break
+            case 'top':
+              // translateY = -topShrink
+              top = top - topShrink
+              break
+            case 'bottom':
+              // translateY = topShrink
+              top = top + topShrink
+              break
             }
           }
           if (state.horizontalFixed) {
             switch (state.onFixedHorizontalDirection) {
-              case 'left':
-                // translateX = -leftShrink
-                left = left - leftShrink
-                break
-              case 'right':
-                // translateX = leftShrink
-                left = left + leftShrink
-                break
+            case 'left':
+              // translateX = -leftShrink
+              left = left - leftShrink
+              break
+            case 'right':
+              // translateX = leftShrink
+              left = left + leftShrink
+              break
             }
           }
           // style.transform = `translate(${translateX}px, ${translateY}px)`
@@ -93,14 +93,14 @@ export default defineComponent({
           const containerElRect = getRect(containerEl)
           const scrollParentRect = getRect(scrollParent)
           switch (direct) {
-            case 'top':
-              return Math.max(state.top + elRect.height - (containerElRect.top - scrollParentRect.top + containerElRect.height), 0)
-            case 'bottom':
-              return Math.max((containerElRect.top - scrollParentRect.top) - state.top, 0)
-            case 'left':
-              return Math.max(state.left + elRect.width - (containerElRect.left - scrollParentRect.left + containerElRect.width), 0)
-            case 'right':
-              return Math.max((containerElRect.left - scrollParentRect.left) - state.left, 0)
+          case 'top':
+            return Math.max(state.top + elRect.height - (containerElRect.top - scrollParentRect.top + containerElRect.height), 0)
+          case 'bottom':
+            return Math.max((containerElRect.top - scrollParentRect.top) - state.top, 0)
+          case 'left':
+            return Math.max(state.left + elRect.width - (containerElRect.left - scrollParentRect.left + containerElRect.width), 0)
+          case 'right':
+            return Math.max((containerElRect.left - scrollParentRect.left) - state.left, 0)
           }
         }
         return 0
@@ -128,20 +128,20 @@ export default defineComponent({
             const {onFixedVerticalScrollTop, onFixedVerticalDirection} = state
             const {scrollTop} = scrollParent
             switch (onFixedVerticalDirection) {
-              case 'top':
-                if (scrollTop <= onFixedVerticalScrollTop) {
-                  state.verticalFixed = false
-                } else {
-                  state.topShrink = getContainerShrink('top')
-                }
-                break
-              case 'bottom':
-                if (scrollTop >= onFixedVerticalScrollTop) {
-                  state.verticalFixed = false
-                } else {
-                  state.topShrink = getContainerShrink('bottom')
-                }
-                break
+            case 'top':
+              if (scrollTop <= onFixedVerticalScrollTop) {
+                state.verticalFixed = false
+              } else {
+                state.topShrink = getContainerShrink('top')
+              }
+              break
+            case 'bottom':
+              if (scrollTop >= onFixedVerticalScrollTop) {
+                state.verticalFixed = false
+              } else {
+                state.topShrink = getContainerShrink('bottom')
+              }
+              break
             }
           } else {
             // top bottom
@@ -176,20 +176,20 @@ export default defineComponent({
             const {onFixedHorizontalScrollLeft, onFixedHorizontalDirection} = state
             const {scrollLeft} = scrollParent
             switch (onFixedHorizontalDirection) {
-              case 'left':
-                if (scrollLeft <= onFixedHorizontalScrollLeft) {
-                  state.horizontalFixed = false
-                } else {
-                  state.leftShrink = getContainerShrink('left')
-                }
-                break
-              case 'right':
-                if (scrollLeft >= onFixedHorizontalScrollLeft) {
-                  state.horizontalFixed = false
-                } else {
-                  state.leftShrink = getContainerShrink('right')
-                }
-                break
+            case 'left':
+              if (scrollLeft <= onFixedHorizontalScrollLeft) {
+                state.horizontalFixed = false
+              } else {
+                state.leftShrink = getContainerShrink('left')
+              }
+              break
+            case 'right':
+              if (scrollLeft >= onFixedHorizontalScrollLeft) {
+                state.horizontalFixed = false
+              } else {
+                state.leftShrink = getContainerShrink('right')
+              }
+              break
             }
           } else {
             // left right

@@ -1,13 +1,13 @@
 <template>
-  <div class="drag-size-container" ref="dragSizeContainer">
-    <div class="resize l" data-type="l" v-if="directions.indexOf('l') !== -1"></div>
-    <div class="resize t" data-type="t" v-if="directions.indexOf('t') !== -1"></div>
-    <div class="resize r" data-type="r" v-if="directions.indexOf('r') !== -1"></div>
-    <div class="resize b" data-type="b" v-if="directions.indexOf('b') !== -1"></div>
-    <div class="resize lt" data-type="lt" v-if="directions.indexOf('lt') !== -1"></div>
-    <div class="resize lb" data-type="lb" v-if="directions.indexOf('lb') !== -1"></div>
-    <div class="resize rt" data-type="rt" v-if="directions.indexOf('rt') !== -1"></div>
-    <div class="resize rb" data-type="rb" v-if="directions.indexOf('rb') !== -1"></div>
+  <div ref="dragSizeContainer" class="drag-size-container">
+    <div v-if="directions.indexOf('l') !== -1" class="resize l" data-type="l"></div>
+    <div v-if="directions.indexOf('t') !== -1" class="resize t" data-type="t"></div>
+    <div v-if="directions.indexOf('r') !== -1" class="resize r" data-type="r"></div>
+    <div v-if="directions.indexOf('b') !== -1" class="resize b" data-type="b"></div>
+    <div v-if="directions.indexOf('lt') !== -1" class="resize lt" data-type="lt"></div>
+    <div v-if="directions.indexOf('lb') !== -1" class="resize lb" data-type="lb"></div>
+    <div v-if="directions.indexOf('rt') !== -1" class="resize rt" data-type="rt"></div>
+    <div v-if="directions.indexOf('rb') !== -1" class="resize rb" data-type="rb"></div>
     <slot></slot>
   </div>
 </template>
@@ -28,7 +28,7 @@ export default defineComponent({
       default: () => []
     }
   },
-  setup(props, context) {
+  setup(props, _ctx) {
     const dragSizeContainer = ref(null)
     const bindDragListener = () => {
       const rootEl = dragSizeContainer.value
@@ -105,12 +105,14 @@ export default defineComponent({
 <style lang="scss" scoped>
 .drag-size-container {
   position: relative;
+
   .resize {
     position: absolute;
     min-width: 1px;
     min-height: 1px;
     background: transparent;
     z-index: 1;
+
     &.l { left: 0; top: 0; bottom: 0; cursor: ew-resize; }
     &.r { right: 0; top: 0; bottom: 0; cursor: ew-resize; }
     &.t { top: 0; left: 0; right: 0; cursor: ns-resize; }

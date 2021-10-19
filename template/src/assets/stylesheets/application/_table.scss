@@ -11,10 +11,12 @@ table.table {
     display: flex;
     border-bottom: 1px solid $border-color;
     flex: 1;
+
     &:first-child {
       border-top: 1px solid $border-color;
     }
   }
+
   th, td {
     flex: 1 0 0%;
     padding: 5px 10px;
@@ -27,22 +29,24 @@ table.table {
     //-webkit-line-clamp: 3;
     //-webkit-box-orient: vertical;
   }
-  &.border {
-    th, td {
-      border-left: 1px solid $border-color;
-      &:last-child {
-        border-right: 1px solid $border-color;
-      }
-    }
-  }
+
   &.text-overflow-ellipsis {
     th, td {
       text-overflow: ellipsis;
       white-space: nowrap;
     }
   }
-}
 
+  &.border {
+    th, td {
+      border-left: 1px solid $border-color;
+
+      &:last-child {
+        border-right: 1px solid $border-color;
+      }
+    }
+  }
+}
 
 //<!--  <table class="table border text-overflow-ellipsis" style="width: 200px; margin: 0 auto;">-->
 //<!--    <tr>-->

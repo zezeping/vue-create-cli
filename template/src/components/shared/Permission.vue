@@ -9,7 +9,7 @@ export default defineComponent({
   props: {
     for: [String],
   },
-  setup (props, context) {
+  setup (_props, _ctx) {
     const state = reactive({
       hasPermission: computed(() => {
         return true

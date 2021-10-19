@@ -40,7 +40,7 @@ export default {
       }
       document.addEventListener('click', onClick, { capture: true })
 
-      const onMouseUp = (event) => {
+      const onMouseUp = (_event) => {
         document.removeEventListener('mousemove', onMouseMove, { capture: true })
         document.removeEventListener('mouseup', onMouseUp, { capture: true })
       }

@@ -8,8 +8,12 @@ module.exports = {
         message: '可快速集成的代码工具集',
         name: 'tools',
         choices: [
-          new inquirer.Separator('支持的工具集'), // 分割线
-          { name: 'eslint', checked: true, },
+          new inquirer.Separator('代码检测'), // 分割线
+          { name: 'eslint', checked: false, },
+          { name: 'stylelint', checked: false, },
+          new inquirer.Separator('git-hooks'), // 分割线
+          { name: 'git-hooks', checked: false, },
+          new inquirer.Separator('其他'), // 分割线
           { name: 'vue-i18n', checked: false, },
           //{ name: 'jest', checked: false, },
         ],
