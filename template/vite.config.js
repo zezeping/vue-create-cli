@@ -11,8 +11,9 @@ import {
   // ElementPlusResolver,
   // VantResolver,
 } from 'unplugin-vue-components/resolvers'
-// https://github.com/jpkleemans/vite-svg-loader
-import svgLoader from 'vite-svg-loader'
+import Icons from 'unplugin-icons/vite'
+import { FileSystemIconLoader } from 'unplugin-icons/loaders'
+import IconsResolver from 'unplugin-icons/resolver'
 
 function pathResolve() {
   return resolve(__dirname, '.', ...arguments)
@@ -64,18 +65,31 @@ export default defineConfig(params => {
       vueJsx(),
       // eslintPlugin({ cache: false }),
       // stylelintPlugin(),
+      Icons({
+        compiler: 'vue3',
+        customCollections: {
+          // <i-svg-help style="font-size: 50px; fill: red;" />
+          svg: FileSystemIconLoader('src/assets/images/svg-icons'),
+          'svg-inline': {
+            // <i-svg-inline-foo />
+            // <i-svg2-foo />
+            foo: `<svg viewBox="0 0 100 100"><rect x="0" y="0" width="100%" height="100%"/><circle cx="50%" cy="50%" r="50" fill="white"/></svg>`,
+          },
+        },
+      }),
       Components({
         resolvers: [
           // AntDesignVueResolver({ importStyle: false }),
           // ElementPlusResolver({ importStyle: false }),
           // VantResolver({ importStyle: false }),
+          IconsResolver({
+            alias: {
+              svg2: 'svg-inline',
+            },
+            customCollections: ['svg', 'svg-inline'],
+          }),
         ],
       }),
-      svgLoader({
-        svgoConfig: {
-          multipass: true
-        }
-      })
     ]
   }
 })

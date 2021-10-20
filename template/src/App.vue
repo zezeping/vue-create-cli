@@ -1,6 +1,8 @@
 <template>
   <img alt="Vue logo" src="@/assets/logo.png" />
-  <svg-icon name="help" style="color: red; width: 100px; height: 100px;"></svg-icon>
+  <i-svg-help style="font-size: 50px; fill: red;" />
+  <i-svg-inline-foo class="svg-icon inherit-color" style="font-size: 50px; color: red;" />
+  <i-svg2-foo />
   <HelloWorld msg="Hello Vue 3 + Vite" />
   <hr />
   <table class="table border text-overflow-ellipsis" style="width: 200px; margin: 0 auto;">

@@ -25,7 +25,7 @@ module.exports = async (projectName, options, command) => {
     private: true,
     main: 'index.js',
     scripts: {
-      svgo: 'svgo -f src/ext/shared/SvgIcon/svg'
+      svgo: 'svgo -f src/assets/images/svg-icons'
     }
   })
   fs.writeJsonSync(path.resolve(projectPath, 'package.json'), packageJson, {spaces: 2})
@@ -34,7 +34,7 @@ module.exports = async (projectName, options, command) => {
   */
   helpers.spawnSync(`npm install && npm i normalize.css axios nprogress vue-router@4 vuex@next vuex-persistedstate -S --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
   // dev插件
-  helpers.spawnSync(`npm install && npm i sass vite-svg-loader unplugin-vue-components @vitejs/plugin-vue-jsx -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+  helpers.spawnSync(`npm install && npm i sass unplugin-vue-components unplugin-icons @vitejs/plugin-vue-jsx -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
   // ui库
   await inquirerStatements.addUiLibraries().then(async selectedAnswers => {
     console.error(selectedAnswers)
