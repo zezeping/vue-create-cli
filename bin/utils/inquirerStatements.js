@@ -8,13 +8,14 @@ module.exports = {
         message: '可快速集成的代码工具集',
         name: 'tools',
         choices: [
-          new inquirer.Separator('代码检测'), // 分割线
+          new inquirer.Separator('--- 代码检测 ---'), // 分割线
           { name: 'eslint', checked: false, },
           { name: 'stylelint', checked: false, },
-          new inquirer.Separator('git-hooks'), // 分割线
+          new inquirer.Separator('--- git-hooks ---'), // 分割线
           { name: 'git-hooks', checked: false, },
-          new inquirer.Separator('其他'), // 分割线
+          new inquirer.Separator('--- 其他 ---'), // 分割线
           { name: 'vue-i18n', checked: false, },
+          { name: 'autoprefixer', checked: false, },
           //{ name: 'jest', checked: false, },
         ],
         validate (answer) {
@@ -28,11 +29,11 @@ module.exports = {
         message: '可快速集成的ui库',
         name: 'uis',
         choices: [
-          new inquirer.Separator(' = PC = '), // 分割线
+          new inquirer.Separator('--- PC ---'), // 分割线
           { name: 'ElementPlus', checked: false, },
           { name: 'AntDesignVue', checked: false, },
-          //new inquirer.Separator(' = WAP = '), // 分割线
-          //{ name: 'Vant', },
+          new inquirer.Separator('--- WAP ---'), // 分割线
+          { name: 'Vant', },
         ],
         validate (answer) {
           //if (answer.length < 1) {

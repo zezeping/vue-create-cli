@@ -2,7 +2,8 @@ import { resolve } from 'path'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import eslintPlugin from 'vite-plugin-eslint'
+// import eslintPlugin from 'vite-plugin-eslint'
+// import stylelintPlugin from '@amatlash/vite-plugin-stylelint'
 // https://github.com/antfu/unplugin-vue-components
 import Components from 'unplugin-vue-components/vite'
 import {
@@ -61,12 +62,13 @@ export default defineConfig(params => {
     plugins: [
       vue(),
       vueJsx(),
-      eslintPlugin({ cache: false }),
+      // eslintPlugin({ cache: false }),
+      // stylelintPlugin(),
       Components({
         resolvers: [
           // AntDesignVueResolver({ importStyle: false }),
           // ElementPlusResolver({ importStyle: false }),
-          // VantResolver({ importStyle: false })
+          // VantResolver({ importStyle: false }),
         ],
       }),
       svgLoader({

@@ -1,4 +1,5 @@
 import 'normalize.css/normalize.css'
+// import 'lib-flexible'
 import './assets/stylesheets/application.scss'
 import { createApp } from 'vue'
 import App from './App.vue'
