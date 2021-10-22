@@ -1,22 +1,25 @@
 import { reactive } from 'vue'
+
 export function useLoading() {
-  const loading = reactive({
+  const loadingState = reactive({
     value: false,
+    data: null,
     async load(executor) {
       console.assert(!!executor, '必须传递执行器')
       try {
-        loading.value = true
+        loadingState.value = true
+        loadingState.data = null
         if (typeof executor === 'object' && typeof executor.then === 'function') {
-          await executor
+          loadingState.data = await executor
         } else if (typeof executor === 'function') {
-          await executor()
+          loadingState.data = await executor()
         }
       } finally {
-        loading.value = false
+        loadingState.value = false
       }
     }
   })
-  return loading
+  return loadingState
 }
 
 //import { useLoading } from '@/utils/hooks/useLoading'

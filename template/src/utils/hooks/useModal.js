@@ -1,4 +1,4 @@
-import { createApp, getCurrentInstance, onUnmounted, h, reactive, defineComponent, provide } from 'vue'
+import { createApp, onUnmounted, h, reactive, defineComponent, provide } from 'vue'
 import { Modal } from 'ant-design-vue'
 import store from '@/store'
 import router from '@/router'
@@ -7,14 +7,13 @@ const createAntDesignModal = (options) => {
   // eslint-disable-next-line no-unused-vars
   const { slots, ...otherOptions } = options
   let appInstance = null
-  let componentInstance = null
+  let modalState = null
   const div = document.createElement('div')
   document.body.appendChild(div)
   // eslint-disable-next-line vue/one-component-per-file
   const ModalComponent = defineComponent({
     emits: ['afterClose'],
     setup(props, ctx) {
-      componentInstance = getCurrentInstance()
       const state = reactive({
         visible: true,
         ...otherOptions,
@@ -33,6 +32,7 @@ const createAntDesignModal = (options) => {
       })
       const slots = reactive(options.slots)
       
+      modalState = state
       provide('modalState', state)
       provide('modalSlots', slots)
       
@@ -59,7 +59,7 @@ const createAntDesignModal = (options) => {
   appInstance.use(router)
   appInstance.mount(div)
   appInstance.close = () => {
-    componentInstance.ctx.modalState.visible = false
+    modalState.visible = false
   }
   return appInstance
 }
