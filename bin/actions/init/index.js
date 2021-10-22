@@ -41,7 +41,7 @@ module.exports = async (projectName, options, command) => {
     // eslint
     if (selectedAnswers.indexOf('eslint') !== -1) {
       logger.info(`添加eslint相关库`)
-      helpers.spawnSync(`npm i eslint@7 eslint-plugin-vue vite-plugin-eslint -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+      helpers.spawnSync(`npm i eslint@7 eslint-plugin-vue vite-plugin-eslint eslint-plugin-jsx-a11y -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
       
       fs.copySync(path.join(librariesPath, 'eslint/.eslintrc.js'), path.join(projectPath, '.eslintrc.js'))
       fs.copySync(path.join(librariesPath, 'eslint/.eslintignore'), path.join(projectPath, '.eslintignore'))

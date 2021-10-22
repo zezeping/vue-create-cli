@@ -5,6 +5,7 @@ module.exports = {
     'plugin:vue/vue3-essential',
     'plugin:vue/vue3-recommended',
     // 'plugin:vue/recommended' // Use this if you are using Vue.js 2.x.
+    'plugin:jsx-a11y/recommended',
   ],
   env: {
     browser: true,

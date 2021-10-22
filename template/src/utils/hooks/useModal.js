@@ -1,72 +1,66 @@
-import { createApp, onUnmounted, h, reactive, defineComponent, provide } from 'vue'
+import { createApp, h, reactive, provide, onUnmounted, getCurrentInstance } from 'vue'
 import { Modal } from 'ant-design-vue'
-import store from '@/store'
-import router from '@/router'
 
 const createAntDesignModal = (options) => {
-  // eslint-disable-next-line no-unused-vars
-  const { slots, ...otherOptions } = options
-  let appInstance = null
-  let modalState = null
+  const { slots, caller, ...otherOptions } = options
   const div = document.createElement('div')
   document.body.appendChild(div)
-  // eslint-disable-next-line vue/one-component-per-file
-  const ModalComponent = defineComponent({
-    emits: ['afterClose'],
-    setup(props, ctx) {
-      const state = reactive({
+  
+  const modalInstance = createApp({
+    setup (_props, _ctx) {
+      if (caller) {
+        const compInstance = getCurrentInstance()
+        compInstance.appContext = caller.appContext
+      }
+      
+      const modalState = reactive({
         visible: true,
         ...otherOptions,
         'onUpdate:visible'(value) {
-          state.visible = value
+          modalState.visible = value
           if (typeof options['onUpdate:visible'] === 'function') {
             options['onUpdate:visible'](...arguments)
           }
         },
         afterClose() {
-          if (typeof state.onAfterClose === 'function') {
-            state.onAfterClose()
+          if (typeof modalState.onAfterClose === 'function') {
+            modalState.onAfterClose()
           }
-          ctx.emit('afterClose')
+          modalInstance.unmount()
         }
       })
-      const slots = reactive(options.slots)
-      
-      modalState = state
-      provide('modalState', state)
-      provide('modalSlots', slots)
       
       onUnmounted(() => {
         div.parentNode?.removeChild(div)
       })
       
+      const modalSlots = reactive(slots)
+      provide('modalState', modalState)
+      provide('modalSlots', modalSlots)
+      
       return {
-        modalState: state,
-        modalSlots: slots
+        modalState,
+        modalSlots,
+        close() {
+          modalState.visible = false
+        }
       }
     },
     render() {
       return h(Modal, this.modalState, this.modalSlots)
     }
   })
-  // eslint-disable-next-line vue/one-component-per-file
-  appInstance = createApp(ModalComponent, {
-    onAfterClose() {
-      appInstance.unmount()
-    }
-  })
-  appInstance.use(store)
-  appInstance.use(router)
-  appInstance.mount(div)
-  appInstance.close = () => {
-    modalState.visible = false
+  modalInstance.mount(div)
+  modalInstance.close = () => {
+    modalInstance._instance.ctx.close()
   }
-  return appInstance
+  return modalInstance
 }
 
 /* usage */
 //import { createVNode } from 'vue'
 //const instance = useModal({
+//  caller: /* getCurrentInstance() */,
 //  title: '新建仓库',
 //  footer: null,
 //  slots: {
