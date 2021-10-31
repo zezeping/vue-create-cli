@@ -17,6 +17,10 @@ module.exports = async (projectName, options, command) => {
   // 创建项目
   helpers.spawnSync(`npm init vite@latest ${projectName} -- --template vue`, [], {shell: true, stdio: 'inherit'})
   
+  try {
+    helpers.spawnSync(`git init`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+  } catch (e) {}
+  
   logger.info(`改造&丰富 基础结构`)
   fs.copySync(path.join(templatePath), path.join(projectPath))
   // package.json
@@ -50,7 +54,7 @@ module.exports = async (projectName, options, command) => {
       fs.writeFileSync(path.join(projectPath, 'vite.config.js'), viteConfig.replace(`// import eslintPlugin from 'vite-plugin-eslint'`, `import eslintPlugin from 'vite-plugin-eslint'`).replace(`// eslintPlugin({ cache: false }),`, `eslintPlugin({ cache: false }),`))
       // package.json
       let packageJson = fs.readJsonSync(path.resolve(projectPath, 'package.json'))
-      packageJson.scripts = { ...packageJson.scripts, 'lint:eslint': 'eslint --ext .js,.vue src' }
+      packageJson.scripts = { ...packageJson.scripts, 'lint:eslint': 'eslint --ext .js,.vue src/' }
       fs.writeJsonSync(path.resolve(projectPath, 'package.json'), packageJson, {spaces: 2})
     } else {
       // vite.config.js
@@ -63,7 +67,7 @@ module.exports = async (projectName, options, command) => {
     // stylelint
     if (selectedAnswers.indexOf('stylelint') !== -1) {
       logger.info(`添加stylelint相关库`)
-      helpers.spawnSync(`npm i stylelint stylelint-config-standard @amatlash/vite-plugin-stylelint -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+      helpers.spawnSync(`npm i stylelint@13 stylelint-config-standard@22 @amatlash/vite-plugin-stylelint -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
       
       fs.copySync(path.join(librariesPath, 'stylelint/.stylelintrc.js'), path.join(projectPath, '.stylelintrc.js'))
       fs.copySync(path.join(librariesPath, 'stylelint/.stylelintignore'), path.join(projectPath, '.stylelintignore'))
@@ -91,7 +95,7 @@ module.exports = async (projectName, options, command) => {
         ...packageJson.scripts,
         'lint-staged': 'lint-staged',
         //prepare 是 NPM 操作生命周期中的一环，在执行 install 的时候会按生命周期顺序执行相应钩子：NPM7：preinstall -> install -> postinstall -> prepublish -> preprepare -> prepare -> postprepare
-        'prepare': 'husky install && husky add .husky/pre-commit "npm run lint-staged"',
+        //'prepare': 'husky install && husky add .husky/pre-commit "npm run lint-staged"',
       }
       packageJson['lint-staged'] = packageJson['lint-staged'] || {}
       if (selectedAnswers.indexOf('eslint') !== -1) {
@@ -112,6 +116,7 @@ module.exports = async (projectName, options, command) => {
       }
       fs.writeJsonSync(path.resolve(projectPath, 'package.json'), packageJson, {spaces: 2})
       helpers.spawnSync(`npm i husky lint-staged -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+      helpers.spawnSync(`npx husky install && husky add .husky/pre-commit "npm run lint-staged"`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
     }
     // vue-i18n
     if (selectedAnswers.indexOf('vue-i18n') !== -1) {
@@ -239,12 +244,5 @@ module.exports = async (projectName, options, command) => {
       ]))
     }
   })
-  
-  try {
-    helpers.spawnSync(`git init`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
-    helpers.spawnSync(`npm i --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
-    logger.info(`运行项目：\n cd ${ projectName }\n npm run dev`)
-  } catch (e) {
-    logger.info(`运行项目：\n cd ${ projectName }\n npm install\n npm run dev`)
-  }
+  logger.info(`运行项目：\n cd ${ projectName }\n npm install\n npm run dev`)
 }

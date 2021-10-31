@@ -42,17 +42,8 @@ module.exports = {
     'vue/require-default-prop': 'off',
     'vue/attribute-hyphenation': 'off',
     'vue/singleline-html-element-content-newline': 'off',
-    'vue/max-attributes-per-line': [
-      'warn', {
-        'singleline': {
-          max: 10,
-          allowFirstLine: true,
-        },
-        'multiline': {
-          max: 5,
-          allowFirstLine: true,
-        },
-      },
-    ],
+    'vue/first-attribute-linebreak': 'off',
+    'vue/max-attributes-per-line': 'off',
+    'vue/multi-word-component-names': 'off'
   },
 }

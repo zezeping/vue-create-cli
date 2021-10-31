@@ -5,7 +5,7 @@ class Cache {
     this._storage = reactive({})
   }
   setValue(cacheKey, options) {
-    if (!this._storage.hasOwnProperty(cacheKey) || options.forceReload || this._storage[cacheKey].checksum !== options.checksum) {
+    if (!Object.prototype.hasOwnProperty.call(this._storage, cacheKey) || options.forceReload || this._storage[cacheKey].checksum !== options.checksum) {
       this._storage[cacheKey] = {
         checksum: options.checksum,
         value: options.defaultValue,
