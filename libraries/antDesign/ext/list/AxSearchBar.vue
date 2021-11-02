@@ -42,7 +42,7 @@ export default defineComponent({
     }
   },
   mounted () {
-    this.$refs.formRef.setDefaultFormModel(this.searchQuery || {})
+    this.$refs.formRef.setFormModel(this.searchQuery || {})
   },
   methods: {
     submit(formData) {

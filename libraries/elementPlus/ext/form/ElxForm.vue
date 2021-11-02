@@ -67,14 +67,17 @@ export default defineComponent({
         }
         return form
       }),
-      setDefaultFormModel(defaultFormModel) {
+      setFormModel(formModel) {
         for (const formItem of (props.config.formItems || [])) {
           if (typeof formItem.setValue === 'function') {
-            formItem.setValue(formItem, defaultFormModel)
-          } else {
-            formItem.value = defaultFormModel[formItem.prop]
+            formItem.setValue(formItem, formModel)
+          } else if (Object.prototype.hasOwnProperty.call(formModel, formItem.prop)) {
+            formItem.value = formModel[formItem.prop]
           }
         }
+      },
+      setDefaultFormModel(defaultFormModel) {
+        state.setFormModel(defaultFormModel)
         state.defaultFormModel = defaultFormModel
       }
     })
@@ -92,9 +95,9 @@ export default defineComponent({
         })
       },
       onReset() {
-        state.setDefaultFormModel(state.defaultFormModel)
+        // state.formRef.resetFields()
         nextTick(() => {
-          state.formRef.resetFields()
+          state.setFormModel(state.defaultFormModel)
           context.emit('reset', {...state.formModel})
         })
       },
