@@ -2,7 +2,7 @@ import { createApp, h, reactive, provide, onUnmounted, getCurrentInstance } from
 import { Modal } from 'ant-design-vue'
 
 const createAntDesignModal = (options) => {
-  const { slots, caller, ...otherOptions } = options
+  const { slots = {}, caller, ...otherOptions } = options
   const div = document.createElement('div')
   document.body.appendChild(div)
   

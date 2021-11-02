@@ -154,7 +154,8 @@ module.exports = async (projectName, options, command) => {
       helpers.spawnSync(`npm i element-plus -S --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
       
       fs.ensureDirSync(path.join(projectPath, 'src/components/shared/elementPlus'))
-      fs.copySync(path.join(librariesPath, 'elementPlus'), path.join(projectPath, 'src/components/shared/elementPlus'))
+      fs.copySync(path.join(librariesPath, 'elementPlus/components'), path.join(projectPath, 'src/components/shared/elementPlus'))
+      fs.copySync(path.join(librariesPath, 'elementPlus/hooks'), path.join(projectPath, 'src/utils/hooks'))
       
       const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import elementPlus from './elementPlus'`, `import elementPlus from './elementPlus'`).replace(`// app.use(elementPlus)`, `app.use(elementPlus)`))
@@ -174,7 +175,8 @@ module.exports = async (projectName, options, command) => {
       helpers.spawnSync(`npm i ant-design-vue@next -S --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
       
       fs.ensureDirSync(path.join(projectPath, 'src/components/shared/antDesign'))
-      fs.copySync(path.join(librariesPath, 'antDesign'), path.join(projectPath, 'src/components/shared/antDesign'))
+      fs.copySync(path.join(librariesPath, 'antDesign/components'), path.join(projectPath, 'src/components/shared/antDesign'))
+      fs.copySync(path.join(librariesPath, 'antDesign/hooks'), path.join(projectPath, 'src/utils/hooks'))
       
       const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import antDesign from './antDesign'`, `import antDesign from './antDesign'`).replace(`// app.use(antDesign)`, `app.use(antDesign)`))
