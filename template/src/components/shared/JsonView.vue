@@ -9,7 +9,7 @@ export default defineComponent({
   name: 'JsonView',
   props: {
     data: {
-      required: true
+      type: [Array, Object]
     },
     space: {
       type: Number,

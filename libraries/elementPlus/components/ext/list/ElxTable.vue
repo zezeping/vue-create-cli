@@ -84,11 +84,9 @@ export default defineComponent({
       tableQueryFormList: computed(() => props.config.searchBar?.formItems || []),
       tableColumns: computed(() => props.config.columns?.filter(item => !item.hidden).map(item => ({slots: { customRender: `${item.dataIndex}Column` }, ...item, })) || []),
       tableData: computed(() => {
-        const data = ctx.attrs.dataSource || props.config.data || state.data
+        const data = ctx.attrs.data || props.config.data || state.data
         return data.map((item, idx) => ({ key: item.id || idx, ...item}))
       }),
-      tableRowSelection: computed(() => props.config.rowSelection),
-      tablePagination: computed(() => ({ ...state.pagination, current: state.pagination[props.mapKeys.pageNo] })),
       slotNames: computed(() => Object.keys(ctx.slots)),
       columnSlotNames: computed(() => state.slotNames.filter(item => /Column$/.test(item))),
       querySlotNames: computed(() => state.slotNames.filter(item => /Query$/.test(item))),
