@@ -1,5 +1,5 @@
 <template>
-  <elx-form v-if="formItems && formItems.length" ref="formRef" class="elx-search-bar" :config="config" v-bind="omitKeys(config, ['formItems'])" @submit="submit">
+  <elx-form v-if="formItems && formItems.length" ref="formRef" class="elx-search-bar" :config="config" v-bind="omitKeys(config, ['omitWriteToUrlParams', 'formItems'])" @submit="submit">
     <template v-for="(slotKey, idx) in slotKeys" :key="idx" #[computedAxFormSlotKey(slotKey)]="slotProps">
       <slot :name="slotKey" v-bind="slotProps"></slot>
     </template>
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, reactive, toRefs, nextTick } from 'vue'
 import ElxForm from '../form/ElxForm'
 import { useOmitKeys } from '@/utils/hooks/useObject'
 export default defineComponent({
@@ -42,7 +42,10 @@ export default defineComponent({
     }
   },
   mounted () {
-    this.$refs.formRef.setFormModel(this.searchQuery || {})
+    this.$refs.formRef.setFormModel({...this.searchQuery, ...this.$route.query})
+    nextTick(() => {
+      this.$emit('search', {...this.$refs.formRef.formModel, ...this.$route.query})
+    })
   },
   methods: {
     submit(formData) {

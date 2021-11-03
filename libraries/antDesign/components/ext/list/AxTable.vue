@@ -17,7 +17,7 @@
 
 <script>
 import { computed, watch, reactive, toRefs, defineComponent } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import AxSearchBar from './AxSearchBar'
 import { useLoading } from '@/utils/hooks/useLoading'
 
@@ -26,6 +26,7 @@ export default defineComponent({
     AxSearchBar
   },
   inheritAttrs: false,
+  expose: ['fetchData'],
   props: {
     mapKeys: {
       type: Object,
@@ -50,7 +51,6 @@ export default defineComponent({
     },
   },
   setup (props, ctx) {
-    const route = useRoute()
     const router = useRouter()
     const state = reactive({
       fetchLoading: useLoading(),
@@ -75,6 +75,11 @@ export default defineComponent({
         const data = ctx.attrs.dataSource || props.config.data || state.data
         return data.map((item, idx) => ({ key: item.id || idx, ...item}))
       }),
+      // 不会填充到url链接上的参数key
+      omitUrlParamsKeys: computed(() => {
+        const omitUrlParamsKeys = (props.config.searchBar?.omitUrlParamsKeys || [])
+        return [...omitUrlParamsKeys/*, 'qs_sorts'*/]
+      }),
       tableRowSelection: computed(() => props.config.rowSelection),
       tablePagination: computed(() => ({ ...state.pagination, current: state.pagination[props.mapKeys.pageNo] })),
       slotNames: computed(() => Object.keys(ctx.slots)),
@@ -96,7 +101,14 @@ export default defineComponent({
         }
         searchQuery = omitBlankSearchQuery
         state.searchQuery = searchQuery
-        await router.replace({ query: searchQuery })
+
+        const writeToUrlParams = {}
+        for (const key in searchQuery) {
+          if (state.omitUrlParamsKeys.indexOf(key) === -1) {
+            writeToUrlParams[key] = searchQuery[key]
+          }
+        }
+        await router.replace({ query: writeToUrlParams })
 
         if (!props.config.fetchData) {
           return
@@ -131,8 +143,6 @@ export default defineComponent({
     watch(() => props.config.pagination, nv => {
       Object.assign(state.pagination, nv)
     }, { immediate: true })
-
-    state.fetchData({ ...route.query })
 
     return {
       ...toRefs(state)

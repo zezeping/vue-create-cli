@@ -96,6 +96,7 @@ export default {
       tableConfig: {
         searchBar: {
           inline: true,
+          omitUrlParamsKeys: ['qs_sorts'],
           formItems: [
             { prop: 'name', value: '', label: '姓名', type: 'el-input',
               attrs: { placeholder: '请输入姓名', clearable: true }, // 绑定到type组件上的属性

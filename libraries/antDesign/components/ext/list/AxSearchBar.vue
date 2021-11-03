@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { computed, defineComponent, reactive, toRefs, nextTick } from 'vue'
 import { useOmitKeys } from '@/utils/hooks/useObject'
 import AxForm from '../form/AxForm'
 export default defineComponent({
@@ -42,7 +42,10 @@ export default defineComponent({
     }
   },
   mounted () {
-    this.$refs.formRef.setFormModel(this.searchQuery || {})
+    this.$refs.formRef.setFormModel({...this.searchQuery, ...this.$route.query})
+    nextTick(() => {
+      this.$emit('search', {...this.$refs.formRef.formModel, ...this.$route.query})
+    })
   },
   methods: {
     submit(formData) {

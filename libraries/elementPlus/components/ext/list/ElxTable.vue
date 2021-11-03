@@ -24,7 +24,7 @@
 
 <script>
 import { computed, watch, reactive, toRefs, defineComponent } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useLoading } from '@/utils/hooks/useLoading'
 import { ElTable, ElTableColumn } from 'element-plus'
 import ElxPagination from './ElxPagination'
@@ -37,6 +37,7 @@ export default defineComponent({
     ElxSearchBar,
   },
   inheritAttrs: false,
+  expose: ['fetchData'],
   props: {
     mapKeys: {
       type: Object,
@@ -61,7 +62,6 @@ export default defineComponent({
     },
   },
   setup (props, ctx) {
-    const route = useRoute()
     const router = useRouter()
     const state = reactive({
       fetchLoading: useLoading(),
@@ -81,6 +81,11 @@ export default defineComponent({
         [props.mapKeys.pageSize]: 20,
         [props.mapKeys.total]: 0,
       },
+      // 不会填充到url链接上的参数key
+      omitUrlParamsKeys: computed(() => {
+        const omitUrlParamsKeys = (props.config.searchBar?.omitUrlParamsKeys || [])
+        return [...omitUrlParamsKeys/*, 'qs_sorts'*/]
+      }),
       tableQueryFormList: computed(() => props.config.searchBar?.formItems || []),
       tableColumns: computed(() => props.config.columns?.filter(item => !item.hidden).map(item => ({slots: { customRender: `${item.dataIndex}Column` }, ...item, })) || []),
       tableData: computed(() => {
@@ -106,7 +111,14 @@ export default defineComponent({
         }
         searchQuery = omitBlankSearchQuery
         state.searchQuery = searchQuery
-        await router.replace({ query: searchQuery })
+
+        const writeToUrlParams = {}
+        for (const key in searchQuery) {
+          if (state.omitUrlParamsKeys.indexOf(key) === -1) {
+            writeToUrlParams[key] = searchQuery[key]
+          }
+        }
+        await router.replace({ query: writeToUrlParams })
 
         if (!props.config.fetchData) {
           return
@@ -141,8 +153,6 @@ export default defineComponent({
     watch(() => props.config.pagination, nv => {
       Object.assign(state.pagination, nv)
     }, { immediate: true })
-
-    state.fetchData({ ...route.query })
 
     return {
       ...toRefs(state)
