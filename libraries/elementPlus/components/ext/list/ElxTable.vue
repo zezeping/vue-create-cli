@@ -1,7 +1,7 @@
 <template>
   <div class="elx-table">
     <slot name="searchBar" :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery">
-      <elx-search-bar :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery" @search="onSearch" @reset="onResetSearch">
+      <elx-search-bar v-if="config.searchBar" :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery" @search="onSearch" @reset="onResetSearch">
         <template v-for="(slotName, idx) in querySlotNames" :key="idx" #[slotName]="slotData">
           <slot :name="slotName" v-bind="slotData"></slot>
         </template>
