@@ -1,66 +1,10 @@
-import { createApp, h, reactive, provide, onUnmounted, getCurrentInstance } from 'vue'
+import { getCurrentInstance, createVNode, defineComponent, reactive, ref, provide, h } from 'vue'
 import { Modal } from 'ant-design-vue'
-
-const createAntDesignModal = (options) => {
-  const { slots = {}, caller, ...otherOptions } = options
-  const div = document.createElement('div')
-  document.body.appendChild(div)
-  
-  const modalInstance = createApp({
-    setup (_props, _ctx) {
-      if (caller) {
-        const compInstance = getCurrentInstance()
-        compInstance.appContext = caller.appContext
-      }
-      
-      const modalState = reactive({
-        visible: true,
-        ...otherOptions,
-        'onUpdate:visible'(value) {
-          modalState.visible = value
-          if (typeof options['onUpdate:visible'] === 'function') {
-            options['onUpdate:visible'](...arguments)
-          }
-        },
-        afterClose() {
-          if (typeof modalState.onAfterClose === 'function') {
-            modalState.onAfterClose()
-          }
-          modalInstance.unmount()
-        }
-      })
-      
-      onUnmounted(() => {
-        div.parentNode?.removeChild(div)
-      })
-      
-      const modalSlots = reactive(slots)
-      provide('modalState', modalState)
-      provide('modalSlots', modalSlots)
-      
-      return {
-        modalState,
-        modalSlots,
-        close() {
-          modalState.visible = false
-        }
-      }
-    },
-    render() {
-      return h(Modal, this.modalState, this.modalSlots)
-    }
-  })
-  modalInstance.mount(div)
-  modalInstance.close = () => {
-    modalInstance._instance.ctx.close()
-  }
-  return modalInstance
-}
 
 /* usage */
 //import { createVNode } from 'vue'
-//const instance = useModal({
-//  caller: /* getCurrentInstance() */,
+//const modal = useModal()
+//const instance = modal.create({
 //  title: '新建仓库',
 //  footer: null,
 //  slots: {
@@ -73,6 +17,75 @@ const createAntDesignModal = (options) => {
 //  }
 //})
 
-export const useModal = (options) => {
-  return createAntDesignModal(options)
+
+const ModalComponent = defineComponent({
+  props: {
+    options: {
+      type: Object,
+      required: true
+    }
+  },
+  setup(props) {
+    const { slots = {}, ...otherOptions } = props.options
+    const modalState = reactive({
+      ...otherOptions,
+      'onUpdate:visible'(value) {
+        modalState.visible = value
+        if (typeof otherOptions['onUpdate:visible'] === 'function') {
+          otherOptions['onUpdate:visible'](...arguments)
+        }
+      }
+    })
+    const modalSlots = reactive(slots)
+    provide('modalState', modalState)
+    provide('modalSlots', modalSlots)
+    
+    return {
+      modalState,
+      modalSlots,
+      close() {
+        modalState.visible = false
+      }
+    }
+  },
+  render() {
+    return h(Modal, this.modalState, this.modalSlots)
+  }
+})
+
+export const useModal = () => {
+  const instance = getCurrentInstance()
+  console.assert(!instance, 'getCurrentInstance无法获取到实例，请检查')
+  const app = instance.appContext.app
+  
+  return {
+    create (options) {
+      const div = document.createElement('div')
+      div.setAttribute('class', 'ant-modal-container')
+      document.body.appendChild(div)
+      
+      const visible = ref(true)
+      
+      app.render(createVNode(ModalComponent, {
+        options: {
+          getContainer: div,
+          ...options,
+          visible,
+          afterClose() {
+            app.render(null, div)
+            div.parentNode.removeChild(div)
+            if (typeof options.onAfterClose === 'function') {
+              options.onAfterClose()
+            }
+          },
+        }
+      }), div)
+      
+      return {
+        close () {
+          visible.value = false
+        }
+      }
+    }
+  }
 }

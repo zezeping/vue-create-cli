@@ -1,68 +1,46 @@
-import { createApp, h, reactive, provide, onUnmounted, getCurrentInstance } from 'vue'
+import { getCurrentInstance, createVNode, defineComponent, reactive, ref, provide, h } from 'vue'
 import { ElDialog } from 'element-plus'
 
-const createElementPlusDialog = (options) => {
-  const { slots = {}, caller, ...otherOptions } = options
-  const div = document.createElement('div')
-  document.body.appendChild(div)
-  
-  const dialogInstance = createApp({
-    setup (_props, _ctx) {
-      if (caller) {
-        const compInstance = getCurrentInstance()
-        compInstance.appContext = caller.appContext
-      }
-      
-      const dialogState = reactive({
-        modelValue: true,
-        ...otherOptions,
-        'onUpdate:modelValue'(value) {
-          dialogState.modelValue = value
-          if (typeof options['onUpdate:modelValue'] === 'function') {
-            options['onUpdate:modelValue'](...arguments)
-          }
-        },
-        onClosed() {
-          if (typeof options.onClosed === 'function') {
-            options.onClosed()
-          }
-          dialogInstance.unmount()
-        }
-      })
-      
-      onUnmounted(() => {
-        div.parentNode?.removeChild(div)
-      })
-      
-      const dialogSlots = reactive(slots)
-      provide('dialogState', dialogState)
-      provide('dialogSlots', dialogSlots)
-      
-      return {
-        dialogState,
-        dialogSlots,
-        close() {
-          dialogState.modelValue = false
-        }
-      }
-    },
-    render() {
-      return h(ElDialog, this.dialogState, this.dialogSlots)
+const ModalComponent = defineComponent({
+  props: {
+    options: {
+      type: Object,
+      required: true
     }
-  })
-  dialogInstance.mount(div)
-  dialogInstance.close = () => {
-    dialogInstance._instance.ctx.close()
+  },
+  setup(props) {
+    const { slots = {}, ...otherOptions } = props.options
+    const dialogState = reactive({
+      ...otherOptions,
+      'onUpdate:modelValue'(value) {
+        dialogState.modelValue = value
+        if (typeof otherOptions['onUpdate:modelValue'] === 'function') {
+          otherOptions['onUpdate:modelValue'](...arguments)
+        }
+      },
+    })
+    const dialogSlots = reactive(slots)
+    provide('modalState', dialogState)
+    provide('modalSlots', dialogSlots)
+    
+    return {
+      dialogState,
+      dialogSlots,
+      close() {
+        dialogState.visible = false
+      }
+    }
+  },
+  render() {
+    return h(ElDialog, this.dialogState, this.dialogSlots)
   }
-  return dialogInstance
-}
+})
 
 /* usage */
 //import { createVNode } from 'vue'
-//const instance = useDialog({
-//  caller: /* getCurrentInstance() */,
+// const dialog = useDialog()
+//const instance = dialog.create({
 //  title: '新建仓库',
-//  footer: null,
 //  slots: {
 //    default: () => createVNode(New, {
 //      onCancel: () => {
@@ -74,5 +52,38 @@ const createElementPlusDialog = (options) => {
 //})
 
 export const useDialog = (options) => {
-  return createElementPlusDialog(options)
+  const instance = getCurrentInstance()
+  console.assert(!instance, 'getCurrentInstance无法获取到实例，请检查')
+  const app = instance.appContext.app
+  
+  return {
+    create (options) {
+      const div = document.createElement('div')
+      div.setAttribute('class', 'ant-modal-container')
+      document.body.appendChild(div)
+      
+      const modelValue = ref(true)
+      
+      app.render(createVNode(ModalComponent, {
+        options: {
+          getContainer: div,
+          ...options,
+          modelValue,
+          onClosed() {
+            app.render(null, div)
+            div.parentNode.removeChild(div)
+            if (typeof options.onClosed === 'function') {
+              options.onClosed()
+            }
+          }
+        }
+      }), div)
+      
+      return {
+        close () {
+          modelValue.value = false
+        }
+      }
+    }
+  }
 }

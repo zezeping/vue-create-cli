@@ -80,7 +80,6 @@ export default defineComponent({
         const omitUrlParamsKeys = (props.config.searchBar?.omitUrlParamsKeys || [])
         return [...omitUrlParamsKeys/*, 'qs_sorts'*/]
       }),
-      tableRowSelection: computed(() => props.config.rowSelection),
       tablePagination: computed(() => ({ ...state.pagination, current: state.pagination[props.mapKeys.pageNo] })),
       slotNames: computed(() => Object.keys(ctx.slots)),
       columnSlotNames: computed(() => state.slotNames.filter(item => /Column$/.test(item))),
