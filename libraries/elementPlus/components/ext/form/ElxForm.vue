@@ -1,6 +1,6 @@
 <template>
   <el-form ref="formRef" class="elx-form" :model="formModel" v-bind="{ ...$attrs, ...formAttrs }">
-    <slot>
+    <slot v-bind="{...$attrs , config, formModel, setFormModel, onSubmit, onReset, onCancel}">
       <template v-for="(formItem, idx) in config.formItems" :key="idx">
         <slot :name="`${formItem.prop}FormItem`" v-bind="{ formItemAttrs: formItemAttrs(formItem), formModel, formItem, onSubmit, onReset, onCancel }">
           <el-form-item v-if="slotKeys.indexOf(`${formItem.name}FormItem`) === -1" v-bind="formItemAttrs(formItem)">
@@ -14,7 +14,7 @@
     <slot name="operationsFormItem" v-bind="{ config, formModel, onSubmit, onReset, onCancel, submitLoading }">
       <el-form-item v-if="slotKeys.indexOf(`operationsFormItem`) === -1" class="operations-form-item" v-bind="config.operationsFormItem">
         <slot name="operations" v-bind="{ config, formModel, onSubmit, onReset, onCancel, submitLoading }">
-          <el-button type="primary" @click="onSubmit">提交</el-button>
+          <el-button type="primary" @click="onSubmit" :loading="submitLoading.value">提交</el-button>
           <el-button @click="onCancel">取消</el-button>
           <el-button @click="onReset">重置</el-button>
         </slot>
@@ -31,6 +31,7 @@ import { useLoading } from '@/utils/hooks/useLoading'
 import ElxSelect from './ElxSelect'
 import ElxCheckboxGroup from './ElxCheckboxGroup'
 export default defineComponent({
+  name: 'ElxForm',
   components: {
     ElInput,
     ElSelect,
@@ -47,19 +48,19 @@ export default defineComponent({
     }
   },
   emits: ['submit', 'reset', 'cancel'],
-  setup(props, context) {
+  setup(props, ctx) {
     const omitKeys = useOmitKeys()
     const state = reactive({
       submitLoading: useLoading(),
-      slotKeys: computed(() => Object.keys(context.slots)),
+      slotKeys: computed(() => Object.keys(ctx.slots)),
       formAttrs: computed(() => omitKeys.value(props.config, ['model', 'formItems'])),
       formItemAttrs: computed(() => (formItem) => omitKeys.value(formItem, ['type', 'attrs', 'value'])),
       formRef: null,
       defaultFormModel: null,
       validate: () => state.formRef.validate(),
       formModel: computed(() => {
-        if (context.attrs.model) {
-          return context.attrs.model
+        if (ctx.attrs.model) {
+          return ctx.attrs.model
         }
         const form = { ...state.defaultFormModel, ...props.config.model }
         for (const formItem of (props.config.formItems || [])) {
@@ -83,14 +84,14 @@ export default defineComponent({
     })
     state.setDefaultFormModel(state.formModel)
 
-    const onCancel = () => context.emit('cancel')
+    const onCancel = () => ctx.emit('cancel')
     return {
       ...toRefs(state),
       omitKeys: useOmitKeys(),
       onSubmit() {
         state.formRef.validate((valid) => {
           if (valid) {
-            context.emit('submit', {...state.formModel}, { submitLoading: state.submitLoading, onCancel })
+            ctx.emit('submit', {...state.formModel}, { submitLoading: state.submitLoading, onCancel })
           }
         })
       },
@@ -98,7 +99,7 @@ export default defineComponent({
         // state.formRef.resetFields()
         nextTick(() => {
           state.setFormModel(state.defaultFormModel)
-          context.emit('reset', {...state.formModel})
+          ctx.emit('reset', {...state.formModel})
         })
       },
       onCancel

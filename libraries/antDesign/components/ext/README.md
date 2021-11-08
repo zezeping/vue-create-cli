@@ -2,20 +2,20 @@
 ```vue
 <template>
   <div class="home">
-    <ax-form :config="formConfig" ref="formRef">
-<!--      <template #usernameFormItem="{ formItem }">-->
-<!--        自定义FormItem{{ formItem }}-->
-<!--      </template>-->
-<!--      <template #username="{field}">-->
-<!--        自定义input: {{ field }}-->
-<!--      </template>-->
+    <ax-form ref="formRef" :config="formConfig">
+      <!--<template #usernameFormItem="{ formItem }">-->
+      <!--  自定义FormItem{{ formItem }}-->
+      <!--</template>-->
+      <!--<template #username="{field}">-->
+      <!--  自定义input: {{ field }}-->
+      <!--</template>-->
     </ax-form>
   </div>
 </template>
 <script>
-import { reactive, toRefs, defineComponent, computed } from 'vue'
+import { reactive, toRefs, defineComponent } from 'vue'
 export default defineComponent({
-  setup (props, context) {
+  setup (_props, _context) {
     const state = reactive({
       formConfig: {
         labelCol: { span: 2 },

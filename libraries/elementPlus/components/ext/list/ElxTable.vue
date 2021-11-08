@@ -1,22 +1,25 @@
 <template>
   <div class="elx-table">
-    <slot name="searchBar" :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery">
-      <elx-search-bar v-if="config.searchBar" :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery" @search="onSearch" @reset="onResetSearch">
-        <template v-for="(slotName, idx) in querySlotNames" :key="idx" #[slotName]="slotData">
-          <slot :name="slotName" v-bind="slotData"></slot>
-        </template>
-      </elx-search-bar>
-    </slot>
-    <el-table v-loading="fetchLoading.value" :data="tableData" v-bind="$attrs">
-      <template v-for="(column, idx) in tableColumns" :key="idx">
-        <el-table-column v-bind="column">
-          <template v-if="column.type !== 'selection'" #default="{row, column: slotColumn, $index}">
-            <slot :name="column.slot || `${column.prop}Column`" v-bind="{row, column: slotColumn, $index}">{{ row[column.prop] }}</slot>
-          </template>
-        </el-table-column>
+    <ax-search-bar :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery" @search="onSearch" @reset="onResetSearch">
+      <template #default="slotProps">
+        <slot name="searchBar" :formItems="tableQueryFormList" :searchQuery="searchQuery" :fetchLoading="fetchLoading" :onSearch="onSearch" :onResetSearch="onResetSearch" v-bind="slotProps"></slot>
       </template>
-    </el-table>
-    <slot name="pagination" :data="pagination" :mapKeys="mapKeys">
+      <template v-for="(slotName, idx) in querySlotNames" :key="idx" #[slotName]="slotData">
+        <slot :name="slotName" v-bind="slotData" :fetchLoading="fetchLoading"></slot>
+      </template>
+    </ax-search-bar>
+    <slot v-bind="{ dataList: tableData, fetchLoading }">
+      <el-table v-loading="fetchLoading.value" :data="tableData" v-bind="$attrs">
+        <template v-for="(column, idx) in tableColumns" :key="idx">
+          <el-table-column v-bind="column">
+            <template v-if="column.type !== 'selection'" #default="{row, column: slotColumn, $index}">
+              <slot :name="column.slot || `${column.prop}Column`" v-bind="{row, column: slotColumn, $index}">{{ row[column.prop] }}</slot>
+            </template>
+          </el-table-column>
+        </template>
+      </el-table>
+    </slot>
+    <slot v-if="enablePagination && !fetchLoading.value" name="pagination" v-bind="{ pagination, mapKeys }">
       <elx-pagination v-model:data="pagination" :mapKeys="mapKeys" :layout="config.pagination?.layout" :pageSizes="config.pagination?.pageSizes" @search="onPageInfoChange"></elx-pagination>
     </slot>
   </div>
@@ -37,8 +40,15 @@ export default defineComponent({
     ElxSearchBar,
   },
   inheritAttrs: false,
-  expose: ['fetchData'],
+  expose: ['fetchData', 'refreshTableData'],
   props: {
+    enablePagination: {
+      type: Boolean,
+    },
+    enableAutoFetch: {
+      type: Boolean,
+      default: true
+    },
     mapKeys: {
       type: Object,
       default: () => ({
@@ -65,6 +75,7 @@ export default defineComponent({
     const router = useRouter()
     const state = reactive({
       fetchLoading: useLoading(),
+      fetchTimes: -1,
       searchQuery: props.config.searchBar?.searchQuery || {},
       onPageInfoChange(pagination) {
         Object.assign(state.pagination, {
@@ -95,7 +106,11 @@ export default defineComponent({
       slotNames: computed(() => Object.keys(ctx.slots)),
       columnSlotNames: computed(() => state.slotNames.filter(item => /Column$/.test(item))),
       querySlotNames: computed(() => state.slotNames.filter(item => /Query$/.test(item))),
+      async refreshTableData() {
+        await state.fetchData()
+      },
       async fetchData(query = {}) {
+        state.fetchTimes += 1
         const { [props.mapKeys.pageNo]: pageNo, [props.mapKeys.pageSize]: pageSize, ...otherQuery } = query
         const pagination =  {
           [props.mapKeys.pageNo]: Number(pageNo || state.pagination[props.mapKeys.pageNo]),
@@ -133,6 +148,11 @@ export default defineComponent({
         })
       },
       async onSearch(formModel) {
+        if (state.fetchTimes === -1) {
+          state.fetchTimes = 0
+          if (!props.enableAutoFetch) return
+        }
+
         state.searchQuery = {
           ...formModel,
           [props.mapKeys.pageNo]: state.searchQuery[props.mapKeys.pageNo],

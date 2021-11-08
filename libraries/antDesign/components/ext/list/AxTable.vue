@@ -1,17 +1,23 @@
 <template>
   <div class="ax-table">
-    <slot name="searchBar" :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery">
-      <ax-search-bar v-if="config.searchBar" :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery" @search="onSearch" @reset="onResetSearch">
-        <template v-for="(slotName, idx) in querySlotNames" :key="idx" #[slotName]="slotData">
-          <slot :name="slotName" v-bind="slotData"></slot>
-        </template>
-      </ax-search-bar>
-    </slot>
-    <a-table :columns="tableColumns" :dataSource="tableData" :pagination="tablePagination" :loading="fetchLoading.value" @change="onPageInfoChange">
-      <template v-for="(column, idx) in tableColumns" :key="idx" #[column.slots.customRender]="{ record, index }">
-        <slot :name="column.slots.customRender || `${column.dataIndex}Column`" v-bind="{ record, index, column, row: record, $index: index }">{{ record[column.dataIndex] }}</slot>
+    <ax-search-bar :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery" @search="onSearch" @reset="onResetSearch">
+      <template #default="slotProps">
+        <slot name="searchBar" :formItems="tableQueryFormList" :searchQuery="searchQuery" :fetchLoading="fetchLoading" :onSearch="onSearch" :onResetSearch="onResetSearch" v-bind="slotProps"></slot>
       </template>
-    </a-table>
+      <template v-for="(slotName, idx) in querySlotNames" :key="idx" #[slotName]="slotData">
+        <slot :name="slotName" v-bind="slotData" :fetchLoading="fetchLoading"></slot>
+      </template>
+    </ax-search-bar>
+    <slot v-bind="{ dataList: tableData, fetchLoading }">
+      <a-table :columns="tableColumns" :dataSource="tableData" :loading="fetchLoading.value" :pagination="!tablePagination" @change="onPageInfoChange" v-bind="$attrs">
+        <template v-for="(column, idx) in tableColumns" :key="idx" #[column.slots.customRender]="{ record, index }">
+          <slot :name="column.slots.customRender || `${column.dataIndex}Column`" v-bind="{ record, index, column, row: record, $index: index }">{{ record[column.dataIndex] }}</slot>
+        </template>
+      </a-table>
+    </slot>
+    <slot v-if="enablePagination && !fetchLoading.value" name="pagination" v-bind="{ pagination, mapKeys }">
+      <ax-pagination :mapKeys="mapKeys" :config="pagination" @change="onPageInfoChange"></ax-pagination>
+    </slot>
   </div>
 </template>
 
@@ -26,8 +32,15 @@ export default defineComponent({
     AxSearchBar
   },
   inheritAttrs: false,
-  expose: ['fetchData'],
+  expose: ['fetchData', 'refreshTableData'],
   props: {
+    enablePagination: {
+      type: Boolean,
+    },
+    enableAutoFetch: {
+      type: Boolean,
+      default: true
+    },
     mapKeys: {
       type: Object,
       default: () => ({
@@ -54,6 +67,7 @@ export default defineComponent({
     const router = useRouter()
     const state = reactive({
       fetchLoading: useLoading(),
+      fetchTimes: -1,
       searchQuery: props.config.searchBar?.searchQuery || {},
       onPageInfoChange(pagination, _filters, _sorter, { _currentDataSource }) {
         state.fetchData({
@@ -84,7 +98,11 @@ export default defineComponent({
       slotNames: computed(() => Object.keys(ctx.slots)),
       columnSlotNames: computed(() => state.slotNames.filter(item => /Column$/.test(item))),
       querySlotNames: computed(() => state.slotNames.filter(item => /Query$/.test(item))),
+      async refreshTableData() {
+        await state.fetchData()
+      },
       async fetchData(query = {}) {
+        state.fetchTimes += 1
         const { [props.mapKeys.pageNo]: pageNo, [props.mapKeys.pageSize]: pageSize, ...otherQuery } = query
         const pagination =  {
           [props.mapKeys.pageNo]: Number(pageNo || state.pagination[props.mapKeys.pageNo]),
@@ -122,6 +140,11 @@ export default defineComponent({
         })
       },
       async onSearch(formModel) {
+        if (state.fetchTimes === -1) {
+          state.fetchTimes = 0
+          if (!props.enableAutoFetch) return
+        }
+
         state.searchQuery = {
           ...formModel,
           [props.mapKeys.pageNo]: state.searchQuery[props.mapKeys.pageNo],

@@ -18,7 +18,7 @@ app.use(api)
 // app.use(i18n)
 app.mount('#app')
 
-app.render = (component, rootContainer) => {
-  if (component) component.appContext = app._context
-  render(component, rootContainer)
+app.render = (vnode, rootContainer) => {
+  if (vnode) vnode.appContext = app._context
+  render(vnode, rootContainer)
 }

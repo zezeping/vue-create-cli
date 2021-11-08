@@ -1,7 +1,7 @@
-import Echarts from './Echarts'
+import { defineAsyncComponent } from 'vue'
 
 export default {
   install(app) {
-    app.component('Echarts', Echarts)
+    app.component('Echarts', defineAsyncComponent(() => import('./Echarts')))
   }
 }

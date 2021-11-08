@@ -1,5 +1,8 @@
 <template>
-  <ax-form v-if="formItems && formItems.length" ref="formRef" class="ax-search-bar" :config="config" v-bind="omitKeys(config, ['formItems'])" @submit="submit">
+  <ax-form v-if="config && formItems && formItems.length" ref="formRef" class="ax-search-bar" :config="config" v-bind="omitKeys(config, ['formItems'])" @submit="submit" @reset="submit">
+    <template #default="slotProps">
+      <slot v-bind="slotProps"></slot>
+    </template>
     <template v-for="(slotKey, idx) in slotKeys" :key="idx" #[computedAxFormSlotKey(slotKey)]="slotProps">
       <slot :name="slotKey" v-bind="slotProps"></slot>
     </template>
@@ -42,9 +45,9 @@ export default defineComponent({
     }
   },
   mounted () {
-    this.$refs.formRef.setFormModel({...this.searchQuery, ...this.$route.query})
+    this.$refs.formRef?.setFormModel({...this.searchQuery, ...this.$route.query})
     nextTick(() => {
-      this.$emit('search', {...this.$refs.formRef.formModel, ...this.$route.query})
+      this.$emit('search', {...this.$refs.formRef?.formModel, ...this.$route.query})
     })
   },
   methods: {
