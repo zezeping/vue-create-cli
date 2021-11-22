@@ -55,6 +55,7 @@ export default defineConfig(params => {
     css: {
       preprocessorOptions: {
         scss: {
+          charset: false,
           // additionalData: `$injectedColor: orange;`
           additionalData: '@import "@/assets/stylesheets/globalInjectedData.scss";'
         }
