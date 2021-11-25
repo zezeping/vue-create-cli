@@ -33,6 +33,7 @@ import { computed, reactive, toRefs, nextTick } from 'vue'
 import { Input, Select, Checkbox, Textarea } from 'ant-design-vue'
 import { useOmitKeys } from '@/utils/hooks/useObject'
 import { useLoading } from '@/utils/hooks/useLoading'
+import AxInput from './AxInput'
 import AxSelect from './AxSelect'
 import AxCheckboxGroup from './AxCheckboxGroup'
 export default {
@@ -42,6 +43,7 @@ export default {
     [Select.name]: Select,
     [Checkbox.name]: Checkbox,
     [Textarea.name]: Textarea,
+    AxInput,
     AxSelect,
     AxCheckboxGroup,
   },
