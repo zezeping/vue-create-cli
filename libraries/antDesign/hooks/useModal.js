@@ -65,8 +65,8 @@ export const useModal = () => {
       document.body.appendChild(div)
       
       const visible = ref(true)
-      
-      app.render(createVNode(ModalComponent, {
+  
+      const modalVNode = createVNode(ModalComponent, {
         options: {
           getContainer: div,
           ...options,
@@ -79,11 +79,13 @@ export const useModal = () => {
             }
           },
         }
-      }), div)
+      })
+      app.render(modalVNode, div)
       
       return {
         close () {
           visible.value = false
+          // modalVNode.component.setupState.close()
         }
       }
     }

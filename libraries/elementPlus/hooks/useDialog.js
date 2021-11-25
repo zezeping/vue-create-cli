@@ -63,8 +63,8 @@ export const useDialog = (options) => {
       document.body.appendChild(div)
       
       const modelValue = ref(true)
-      
-      app.render(createVNode(ModalComponent, {
+  
+      const modalVNode = createVNode(ModalComponent, {
         options: {
           getContainer: div,
           ...options,
@@ -77,11 +77,13 @@ export const useDialog = (options) => {
             }
           }
         }
-      }), div)
+      })
+      app.render(modalVNode, div)
       
       return {
         close () {
           modelValue.value = false
+          // modalVNode.component.setupState.close()
         }
       }
     }
