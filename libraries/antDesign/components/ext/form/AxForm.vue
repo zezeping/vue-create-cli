@@ -5,12 +5,14 @@
         <slot :name="`${formItem.name}FormItem`" v-bind="{ formItemAttrs: formItemAttrs(formItem), formItem, formModel, onSubmit, onReset, onCancel }">
           <a-form-item v-if="slotKeys.indexOf(`${formItem.name}FormItem`) === -1" v-bind="formItemAttrs(formItem)">
             <slot :name="formItem.name" v-bind="{ formItem, formModel, onSubmit, onReset, onCancel }">
-              <template v-if="'a-checkbox' === formItem.type">
-                <a-checkbox v-model:checked="formItem.value" v-bind="formItem.attrs">{{ formItem.attrs.label || formItem.value }}</a-checkbox>
-              </template>
-              <template v-else>
-                <component :is="formItem.type" v-model:value="formItem.value" v-bind="formItem.attrs"></component>
-              </template>
+              <DelayChangeFragment #default="delayChangeAttrs">
+                <template v-if="'a-checkbox' === formItem.type">
+                  <a-checkbox v-model:checked="formItem.value" v-bind="{...formItem.attrs, ...delayChangeAttrs}">{{ formItem.attrs.label || formItem.value }}</a-checkbox>
+                </template>
+                <template v-else>
+                  <component :is="formItem.type" v-model:value="formItem.value" v-bind="{...formItem.attrs, ...delayChangeAttrs}"></component>
+                </template>
+              </DelayChangeFragment>
             </slot>
           </a-form-item>
         </slot>
@@ -33,7 +35,7 @@ import { computed, reactive, toRefs, nextTick } from 'vue'
 import { Input, Select, Checkbox, Textarea } from 'ant-design-vue'
 import { useOmitKeys } from '@/utils/hooks/useObject'
 import { useLoading } from '@/utils/hooks/useLoading'
-import AxInput from './AxInput'
+import DelayChangeFragment from '@/components/shared/fragments/DelayChangeFragment'
 import AxSelect from './AxSelect'
 import AxCheckboxGroup from './AxCheckboxGroup'
 export default {
@@ -43,7 +45,7 @@ export default {
     [Select.name]: Select,
     [Checkbox.name]: Checkbox,
     [Textarea.name]: Textarea,
-    AxInput,
+    DelayChangeFragment,
     AxSelect,
     AxCheckboxGroup,
   },

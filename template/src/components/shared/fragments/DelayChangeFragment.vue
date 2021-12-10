@@ -1,16 +1,16 @@
 <template>
-  <a-input @change="onChange"></a-input>
+  <slot v-bind="{onChange: onDelayChange}"></slot>
 </template>
 
 <script lang='jsx'>
 import { reactive, toRefs, defineComponent, nextTick } from 'vue'
 
 export default defineComponent({
+  inheritAttrs: false,
   emits: ['change'],
-  setup (props, ctx) {
+  setup (_props, ctx) {
     const state = reactive({
-      // 修复AxForms使用computed属性校验时无法得到最新数据
-      onChange() {
+      onDelayChange() {
         nextTick(() => {
           ctx.emit('change', ...arguments)
         })
