@@ -1,6 +1,6 @@
 <template>
   <div class="ax-table">
-    <ax-search-bar :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery" @search="onSearch" @reset="onResetSearch">
+    <ax-search-bar :formItems="tableQueryFormList" :config="config.searchBar" :searchQuery="searchQuery" :enableAutoFetch="enableAutoFetch" @search="onSearch" @reset="onResetSearch">
       <template #default="slotProps">
         <slot name="searchBar" :formItems="tableQueryFormList" :searchQuery="searchQuery" :fetchLoading="fetchLoading" :onSearch="onSearch" :onResetSearch="onResetSearch" v-bind="slotProps"></slot>
       </template>
@@ -65,9 +65,10 @@ export default defineComponent({
   },
   setup (props, ctx) {
     const router = useRouter()
+    const route = useRoute()
     const state = reactive({
       fetchLoading: useLoading(),
-      fetchTimes: -1,
+      fetchTimes: 0,
       searchQuery: props.config.searchBar?.searchQuery || {},
       onPageInfoChange(pagination, _filters, _sorter, { _currentDataSource }) {
         state.fetchData({
@@ -79,8 +80,8 @@ export default defineComponent({
       data: [],
       // paginationData
       pagination: {
-        [props.mapKeys.pageNo]: 1,
-        [props.mapKeys.pageSize]: 20,
+        [props.mapKeys.pageNo]: route.query[props.mapKeys.pageNo] || 1,
+        [props.mapKeys.pageSize]: route.query[props.mapKeys.pageSize] || 20,
         [props.mapKeys.total]: 0,
       },
       tableQueryFormList: computed(() => props.config.searchBar?.formItems || []),
@@ -99,7 +100,7 @@ export default defineComponent({
       columnSlotNames: computed(() => state.slotNames.filter(item => /Column$/.test(item))),
       querySlotNames: computed(() => state.slotNames.filter(item => /Query$/.test(item))),
       async refreshTableData() {
-        await state.fetchData()
+        await state.fetchData(route.query)
       },
       async fetchData(query = {}) {
         state.fetchTimes += 1
@@ -140,11 +141,6 @@ export default defineComponent({
         })
       },
       async onSearch(formModel) {
-        if (state.fetchTimes === -1) {
-          state.fetchTimes = 0
-          if (!props.enableAutoFetch) return
-        }
-
         state.searchQuery = {
           ...formModel,
           [props.mapKeys.pageNo]: state.searchQuery[props.mapKeys.pageNo],

@@ -1,6 +1,6 @@
 <template>
   <a-form ref="formRef" class="ax-form" :model="formModel" v-bind="{...$attrs, ...formAttrs}">
-    <slot v-bind="{...$attrs , config, formModel, setFormModel, onSubmit, onReset, onCancel}">
+    <slot v-bind="{...$attrs, config, formModel, setFormModel, onSubmit, onReset, onCancel}">
       <template v-for="(formItem, idx) in config.formItems" :key="idx">
         <slot :name="`${formItem.name}FormItem`" v-bind="{ formItemAttrs: formItemAttrs(formItem), formItem, formModel, onSubmit, onReset, onCancel }">
           <a-form-item v-if="slotKeys.indexOf(`${formItem.name}FormItem`) === -1" v-bind="formItemAttrs(formItem)">

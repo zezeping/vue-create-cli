@@ -28,6 +28,10 @@ export default defineComponent({
     ElxForm,
   },
   props: {
+    enableAutoFetch: {
+      type: Boolean,
+      required: true,
+    },
     config: Object,
     formItems: Array,
     searchQuery: Object,
@@ -46,9 +50,11 @@ export default defineComponent({
   },
   mounted () {
     this.$refs.formRef?.setFormModel({...this.searchQuery, ...this.$route.query})
-    nextTick(() => {
-      this.$emit('search', {...this.$refs.formRef?.formModel, ...this.$route.query})
-    })
+    if (this.enableAutoFetch) {
+      nextTick(() => {
+        this.$emit('search', {...this.$refs.formRef?.formModel, ...this.$route.query})
+      })
+    }
   },
   methods: {
     submit(formData) {
