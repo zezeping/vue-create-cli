@@ -21,8 +21,8 @@ const apiAxios = new Proxy(axios.create({
 //})
 apiAxios.defaults.meta = {
   // 请求重试
-  retry: 1/*times*/, retryDelay: 100/*ms*/, curRetry: 0/*times*/,
-  // 断开相同请求，判断条件 如果!!cancelToken存在则计算config.url+cancelToken的值作为唯一key值，key值相同，则断开之前请求
+  retry: 0/*times*/, retryDelay: 100/*ms*/, curRetry: 0/*times*/,
+  // 断开相同请求，判断条件 如果!!cancelToken存在 则计算config.url+cancelToken的值作为唯一key值，key值相同，则断开之前请求
   cancelToken: '',
 }
 // 设置 post 请求头

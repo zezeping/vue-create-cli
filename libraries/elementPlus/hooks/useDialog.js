@@ -20,20 +20,24 @@ const ModalComponent = defineComponent({
       },
     })
     const dialogSlots = reactive(slots)
-    provide('modalState', dialogState)
-    provide('modalSlots', dialogSlots)
+    provide('dialogState', new Proxy(dialogState, {
+      get(target, key, ...args) {
+        if (key === 'close') {
+          return () => target['onUpdate:modelValue'](false)
+        }
+        return Reflect.get(...arguments)
+      }
+    }))
+    provide('dialogSlots', dialogSlots)
     
     return {
       dialogState,
       dialogSlots,
-      close() {
-        dialogState.visible = false
-      }
     }
   },
   render() {
     return h(ElDialog, this.dialogState, this.dialogSlots)
-  }
+  },
 })
 
 /* usage */
@@ -51,22 +55,23 @@ const ModalComponent = defineComponent({
 //  }
 //})
 
-export const useDialog = (options) => {
+export const useDialog = (defaultOptions) => {
   const instance = getCurrentInstance()
-  console.assert(!instance, 'getCurrentInstance无法获取到实例，请检查')
+  console.assert(!!instance, 'getCurrentInstance无法获取到实例，请检查')
   const app = instance.appContext.app
   
   return {
     create (options) {
       const div = document.createElement('div')
-      div.setAttribute('class', 'ant-modal-container')
+      div.setAttribute('class', 'el-modal-container')
       document.body.appendChild(div)
       
       const modelValue = ref(true)
-  
+      
       const modalVNode = createVNode(ModalComponent, {
         options: {
-          getContainer: div,
+          //destroyOnClose: true,
+          ...defaultOptions,
           ...options,
           modelValue,
           onClosed() {

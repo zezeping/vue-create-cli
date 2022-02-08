@@ -37,7 +37,14 @@ const ModalComponent = defineComponent({
       }
     })
     const modalSlots = reactive(slots)
-    provide('modalState', modalState)
+    provide('modalState', new Proxy(modalState, {
+      get(target, key, ...args) {
+        if (key === 'close') {
+          return () => target['onUpdate:visible'](false)
+        }
+        return Reflect.get(...arguments)
+      }
+    }))
     provide('modalSlots', modalSlots)
     
     return {
@@ -53,9 +60,9 @@ const ModalComponent = defineComponent({
   }
 })
 
-export const useModal = () => {
+export const useModal = (defaultOptions) => {
   const instance = getCurrentInstance()
-  console.assert(!instance, 'getCurrentInstance无法获取到实例，请检查')
+  console.assert(!!instance, 'getCurrentInstance无法获取到实例，请检查')
   const app = instance.appContext.app
   
   return {
@@ -69,6 +76,7 @@ export const useModal = () => {
       const modalVNode = createVNode(ModalComponent, {
         options: {
           getContainer: div,
+          ...defaultOptions,
           ...options,
           visible,
           afterClose() {

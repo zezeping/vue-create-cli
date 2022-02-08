@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useLoader } from '@/utils/hooks/useRouterLoader'
+import { useDefine } from '@/utils/hooks/useRouterDefine'
 
 const routes = [
-  { path: '/', name: 'Home', component: useLoader(() => import('../views/home')), },
-  { path: '/:pathMatch(.*)*', name: 'NotFound', component: useLoader(() => import('@/views/notFound')), },
+  useDefine({ path: '/', name: 'Home', component: () => import('../views/home'), }),
+  useDefine({ path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/notFound'), }),
 ]
 
 const router = createRouter({

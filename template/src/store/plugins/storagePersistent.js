@@ -8,7 +8,10 @@ const plugin = createPersistedState({
     // 整个module字段都持久化
     storage: state.storage,
     // 持久化部分module字段
-    // user: { userInfo: state.user.userInfo }
+     user: {
+      authInfo: state.user.authInfo,
+      userInfo: state.user.userInfo,
+    }
   })
 })
 
