@@ -19,6 +19,6 @@ app.use(api)
 app.mount('#app')
 
 app.render = (vnode, rootContainer) => {
-  if (vnode) vnode.appContext = app._context
+  if (vnode && !vnode.appContext) vnode.appContext = app._context
   render(vnode, rootContainer)
 }

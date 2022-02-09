@@ -83,6 +83,7 @@ export const useDialog = (defaultOptions) => {
           }
         }
       })
+      modalVNode.appContext = instance.appContext
       app.render(modalVNode, div)
       
       return {

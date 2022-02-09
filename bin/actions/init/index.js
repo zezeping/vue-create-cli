@@ -38,7 +38,7 @@ module.exports = async (projectName, options, command) => {
   */
   helpers.spawnSync(`npm install && npm i normalize.css axios nprogress vue-router@4 vuex@next vuex-persistedstate -S --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
   // dev插件
-  helpers.spawnSync(`npm install && npm i sass unplugin-vue-components unplugin-icons @vitejs/plugin-vue-jsx -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+  helpers.spawnSync(`npm install && npm i sass unplugin-vue-components unplugin-icons @vitejs/plugin-vue-jsx rollup-plugin-visualizer -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
   // ui库
   await inquirerStatements.addUiLibraries().then(async selectedAnswers => {
     console.error(selectedAnswers)
@@ -172,7 +172,7 @@ module.exports = async (projectName, options, command) => {
     // AntDesignVue
     if (selectedAnswers.indexOf('AntDesignVue') !== -1) {
       logger.info(`添加AntDesignVue相关库`)
-      helpers.spawnSync(`npm i ant-design-vue@next -S --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+      helpers.spawnSync(`npm i ant-design-vue@next @ant-design/icons-vue -S --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
       
       fs.ensureDirSync(path.join(projectPath, 'src/components/shared/antDesign'))
       fs.copySync(path.join(librariesPath, 'antDesign/components'), path.join(projectPath, 'src/components/shared/antDesign'))
@@ -182,7 +182,7 @@ module.exports = async (projectName, options, command) => {
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), uiConfig.replace(`// import antDesign from './antDesign'`, `import antDesign from './antDesign'`).replace(`// app.use(antDesign)`, `app.use(antDesign)`))
       
       const viteConfig = fs.readFileSync(path.join(projectPath, 'vite.config.js'), 'utf-8')
-      fs.writeFileSync(path.join(projectPath, 'vite.config.js'), viteConfig.replace(`// AntDesignVueResolver,`, `AntDesignVueResolver,`).replace(`// AntDesignVueResolver({ importStyle: false }),`, `AntDesignVueResolver({ importStyle: false }),`))
+      fs.writeFileSync(path.join(projectPath, 'vite.config.js'), viteConfig.replace(`// AntDesignVueResolver,`, `AntDesignVueResolver,`).replace(`// AntDesignVueResolver({ importStyle: false, resolveIcons: true }),`, `AntDesignVueResolver({ importStyle: false, resolveIcons: true }),`))
     } else {
       const uiConfig = fs.readFileSync(path.join(projectPath, 'src/components/shared/index.js'), 'utf-8')
       fs.writeFileSync(path.join(projectPath, 'src/components/shared/index.js'), helpers.removeContainsTextLines(uiConfig, [

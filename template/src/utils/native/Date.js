@@ -1,6 +1,6 @@
 if (!Date.prototype.strftime) {
   Object.defineProperty(Date.prototype, 'strftime', {
-    value(dateFormat = '%Y-%M-%d %H:%m:%s') {
+    value(dateFormat = '%Y-%M-%d %H:%m:%s') { // === moment(this).format('YYYY-MM-DD HH:mm:ss')
       const year = this.getFullYear()
       const month = this.getMonth() + 1
       const day = this.getDate()
