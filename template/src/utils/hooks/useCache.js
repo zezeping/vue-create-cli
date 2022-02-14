@@ -4,7 +4,7 @@ class Cache {
   constructor() {
     this._storage = reactive({})
   }
-  setValue(cacheKey, options) {
+  setDefaultValue(cacheKey, options) {
     if (!Object.prototype.hasOwnProperty.call(this._storage, cacheKey) || options.forceReload || this._storage[cacheKey].checksum !== options.checksum) {
       this._storage[cacheKey] = {
         checksum: options.checksum,
@@ -15,7 +15,7 @@ class Cache {
   }
   getValue(cacheKey, dataLoader, options) {
     console.assert(typeof dataLoader === 'function', 'dataLoader必须为返回Promise的函数')
-    this.setValue(cacheKey, options)
+    this.setDefaultValue(cacheKey, options)
     return computed(() => {
       // 只有使用到该变量才去获取数据
       if (!this._storage[cacheKey].loaded) {

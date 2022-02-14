@@ -1,5 +1,5 @@
-import { getCurrentInstance, createVNode, defineComponent, reactive, ref, provide, h } from 'vue'
-import { Modal } from 'ant-design-vue'
+import { getCurrentInstance, onBeforeMount, createVNode, defineComponent, reactive, ref, provide, inject, h } from 'vue'
+import { Modal, ConfigProvider } from 'ant-design-vue'
 
 /* usage */
 //import { createVNode } from 'vue'
@@ -23,7 +23,8 @@ const ModalComponent = defineComponent({
     options: {
       type: Object,
       required: true
-    }
+    },
+    configProvider: [Object]
   },
   setup(props) {
     const { slots = {}, ...otherOptions } = props.options
@@ -56,12 +57,18 @@ const ModalComponent = defineComponent({
     }
   },
   render() {
-    return h(Modal, this.modalState, this.modalSlots)
+    const modal = h(Modal, this.modalState, this.modalSlots)
+    return this.configProvider ? h(ConfigProvider, {
+      locale: this.configProvider.locale,
+    }, {
+      default: () => modal
+    }) : modal
   }
 })
 
 export const useModal = (defaultOptions) => {
   const instance = getCurrentInstance()
+  const configProvider = inject('configProvider', null)
   console.assert(!!instance, 'getCurrentInstance无法获取到实例，请检查')
   const app = instance.appContext.app
   
@@ -72,9 +79,10 @@ export const useModal = (defaultOptions) => {
       document.body.appendChild(div)
       
       const visible = ref(true)
-  
+      
       const modalVNode = createVNode(ModalComponent, {
         options: {
+          maskClosable: false,
           getContainer: div,
           ...defaultOptions,
           ...options,
@@ -86,7 +94,8 @@ export const useModal = (defaultOptions) => {
               options.onAfterClose()
             }
           },
-        }
+        },
+        configProvider
       })
       modalVNode.appContext = instance.appContext
       app.render(modalVNode, div)

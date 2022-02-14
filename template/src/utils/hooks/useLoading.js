@@ -17,6 +17,7 @@ export function useLoading() {
       } finally {
         loadingState.value = false
       }
+      return loadingState.data
     }
   })
   return loadingState
