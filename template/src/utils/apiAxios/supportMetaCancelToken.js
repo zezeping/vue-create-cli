@@ -36,7 +36,7 @@ export default function (axios) {
   
   // 请求拦截
   axios.interceptors.request.use(config => {
-    if (config.meta?.cancelToken) {
+    if (config.meta?.cancelToken && /get/i.test(config.method)) {
       createCancelToken(config)
     }
     return config

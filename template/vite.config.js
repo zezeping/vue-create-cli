@@ -98,6 +98,12 @@ export default defineConfig(params => {
           charset: false,
           // additionalData: `$injectedColor: orange;`
           additionalData: '@import "@/assets/stylesheets/globalInjectedData.scss";'
+        },
+        less: {
+          modifyVars: {
+            '@primary-color': '#1990EB',
+          },
+          javascriptEnabled: true,
         }
       }
     },
