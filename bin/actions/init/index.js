@@ -36,9 +36,9 @@ module.exports = async (projectName, options, command) => {
   /*
   * 安装插件 axios vue-router@4 vuex@next vuex-persistedstate
   */
-  helpers.spawnSync(`npm install && npm i normalize.css axios nprogress vue-router@4 vuex@next vuex-persistedstate -S --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+  helpers.spawnSync(`npm install && npm i normalize.css axios nprogress vue-router@4 vuex@next vuex-persistedstate ui-define -S --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
   // dev插件
-  helpers.spawnSync(`npm install && npm i sass unplugin-vue-components unplugin-icons @vitejs/plugin-vue-jsx rollup-plugin-visualizer -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
+  helpers.spawnSync(`npm install && npm i sass less unplugin-vue-components unplugin-icons @vitejs/plugin-vue-jsx rollup-plugin-visualizer -D --registry ${registry}`, [], { shell: true, stdio: 'inherit', cwd: projectPath })
   // ui库
   await inquirerStatements.addUiLibraries().then(async selectedAnswers => {
     console.error(selectedAnswers)
